@@ -9,4 +9,6 @@ Thumbs.db
 
 # Project files #
 ######################
+.sass-cache
 node_modules
+dist

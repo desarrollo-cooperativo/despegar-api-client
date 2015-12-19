@@ -22,6 +22,9 @@
   },
   "homepage": "https://github.com/desarrollo-cooperativo/despegar-api-client#readme",
   "devDependencies": {
-    "gulp": "^3.9.0"
+    "gulp": "^3.9.0",
+    "gulp-compass": "^2.1.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-plumber": "^1.0.1",
   }
 }
