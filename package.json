@@ -1,0 +1,27 @@
+{
+  "name": "despegar-api-client",
+  "version": "1.0.0",
+  "description": "Desarrollo Cooperativo - API Despegar.com",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/desarrollo-cooperativo/despegar-api-client.git"
+  },
+  "keywords": [
+    "Desarrollo Cooperativo",
+    "Despegar.com",
+    "API"
+  ],
+  "author": "Desarrollo Cooperativo",
+  "license": "SEE LICENSE IN license.md",
+  "bugs": {
+    "url": "https://github.com/desarrollo-cooperativo/despegar-api-client/issues"
+  },
+  "homepage": "https://github.com/desarrollo-cooperativo/despegar-api-client#readme",
+  "devDependencies": {
+    "gulp": "^3.9.0"
+  }
+}
