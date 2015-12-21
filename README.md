@@ -1,25 +1,19 @@
 # despegar-api-client
 
-** Development
+## Development
 
-* Instalar Gulp
+### Instalar Gulp
 
-´´´
-npm install -g gulp
-´´´
+`npm install -g gulp`
 
 https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md
 
-* Instalar packs locales con npm
+### Instalar packs locales con npm
 
-´´´
-npm install
-´´´
+`npm install`
 
-* Correr las tasks de gulp
+### Correr las tasks de gulp
 
-´´´
-gulp build
-´´´
+`gulp build`
 
 Luego cargar en el browser index.html
