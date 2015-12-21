@@ -1,29 +1,34 @@
-var gulp        = require('gulp'),
-    compass     = require('gulp-compass'),
-    plumber     = require('gulp-plumber'),
-    concat      = require('gulp-concat'),
-    config      = {
-                    // bootstrap_dir:   './npm_modules/bootstrap',
-                    public_dir:     './dist',
-                  };
+var gulp = require('gulp'),
+   uglify = require('gulp-uglify'),
+   rename = require('gulp-rename'),
+   concat = require('gulp-concat'),
+   minifyCss = require('gulp-minify-css');
 
-gulp.task('default', function() {
-  // place code for your default task here
+gulp.task('minify', function () {
+   gulp.src('src/js/app.js')
+      .pipe(uglify())
+      .pipe(rename({ extname: '.min.js' }))
+      .pipe(gulp.dest('src/js'))
 });
 
-gulp.task('compass', [], function() {
-  return gulp.src(['app/views/**/*.scss'])
-    .pipe(plumber({
-      errorHandler: function (error) {
-        console.log(error.message);
-        this.emit('end');
-    }}))
-    .pipe(concat('app.scss'))
-    .pipe(gulp.dest(config.public_dir + '/scss'))
-    .pipe(compass({
-      // import_path: [config.bootstrap_dir + '/assets/stylesheets'],
-      css: config.public_dir + '/css',
-      sass: config.public_dir + '/scss'
-    }))
-    .pipe(gulp.dest(config.public_dir + '/css'));
+gulp.task('concat',['minify'],function(){
+  gulp.src(['node_modules/vue/dist/vue.min.js','src/js/app.min.js'])
+  .pipe(concat('despegarapi.min.js'))
+  .pipe(gulp.dest('build'))
 });
+
+gulp.task('minify-css', function () {
+   gulp.src('src/css/app.css')
+      .pipe(minifyCss())
+      .pipe(rename('app.min.css'))
+      .pipe(gulp.dest('src/css/'))
+});
+
+
+gulp.task('css',['minify-css'], function () {
+   gulp.src(['src/css/bootstrap.min.css','src/css/app.min.css'])
+    .pipe(concat('despegarapi.min.css'))
+  .pipe(gulp.dest('build'))
+});
+
+gulp.task('build', ['css', 'concat']);
