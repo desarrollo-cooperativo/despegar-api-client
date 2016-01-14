@@ -14,6 +14,6 @@ https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md
 
 ### Correr las tasks de gulp
 
-`gulp build`
+`gulp build
 
 Luego cargar en el browser index.html
