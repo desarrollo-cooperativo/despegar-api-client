@@ -36,7 +36,7 @@ gulp.task('watch', ['styles', 'scripts', 'copy-html', 'copy-fonts'], function ()
   ], ['styles']);
 
   gulp.watch([
-    'src/scripts/**/*.js'
+    'src/js/**/*.js'
   ], ['scripts']);
 
   gulp.watch([
