@@ -4,7 +4,8 @@ var gulp      = require('gulp'),
     concat    = require('gulp-concat'),
     minifyCss = require('gulp-minify-css'),
     watch     = require('gulp-watch'),
-    sass      = require('gulp-sass');
+    sass      = require('gulp-sass'),
+    plumber   = require('gulp-plumber');
 
 gulp.task('styles', function () {
   gulp.src(['node_modules/bootstrap/dist/css/**/*.css','src/css/**/*.scss'])
