@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>API despegar</title>
-    <link rel="stylesheet" type="text/css" href="build/despegarapi.min.css">
+    <link rel="stylesheet" type="text/css" href="css/despegarapi.min.css">
 </head>
 <body>
 
@@ -65,22 +65,19 @@
   <div class="alert alert-success" role="alert">Esto funciona</div>
     <counter subject="Likes"></counter>
     <counter subject="Dislikes"></counter>
-    
-
-
   </div>
 
-  
+
   <template id="counter-template">
     <h1>{{ subject }}</h1>
-  
+
     <button @click="count += 1">
       {{ count }}
     </button>
   </template>
 
-  
-    <script src="build/despegarapi.min.js"></script>
+
+    <script src="js/despegarapi.min.js"></script>
     <script type="text/javascript">
       Vue.component('counter', {
         props: ['subject'],
@@ -97,7 +94,7 @@
         el: '#app'
       });
 
-       
+
 
     </script>
 
