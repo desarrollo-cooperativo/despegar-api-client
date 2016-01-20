@@ -8,15 +8,19 @@ var gulp      = require('gulp'),
 
 gulp.task('styles', function () {
   gulp.src(['node_modules/bootstrap/dist/css/**/*.css','src/css/**/*.scss'])
+    .pipe(plumber())
     .pipe(concat('despegarapi.min.css'))
     .pipe(sass({outputStyle: 'compressed'}))
+    .pipe(plumber.stop())
     .pipe(gulp.dest('dist/css'));
 });
 
 gulp.task('scripts', function () {
   gulp.src(['node_modules/vue/dist/vue.min.js','node_modules/bootstrap/dist/js/bootstrap.js','src/js/**/*.js'])
+    .pipe(plumber())
     .pipe(concat('despegarapi.min.js'))
     .pipe(uglify())
+    .pipe(plumber.stop())
     .pipe(gulp.dest('dist/js'))
 });
 
