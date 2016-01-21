@@ -4,7 +4,7 @@
 
 Navegar, en la terminal hasta la carpeta donde este ubicado el projecto y ejecutar:
 
-`npm install`
+`npm install --save-dev`
 
 Esto instalará todas las herramientas necesarias para poder desarrollar y compilar luego la aplicación.
 

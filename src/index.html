@@ -59,42 +59,35 @@
 
   <div id="app" class="container-fluid">
 
+  <button @click="getPaises">Call</button>
 
 
-
-  <div class="alert alert-success" role="alert">Esto funciona</div>
-    <counter subject="Likes"></counter>
-    <counter subject="Dislikes"></counter>
+  <div class="alert alert-success" role="alert">Esto no funciona</div>
+    
   </div>
 
 
-  <template id="counter-template">
-    <h1>{{ subject }}</h1>
-
-    <button @click="count += 1">
-      {{ count }}
-    </button>
-  </template>
-
+  
 
     <script src="js/despegarapi.min.js"></script>
+
     <script type="text/javascript">
-      Vue.component('counter', {
-        props: ['subject'],
-
-        data: function() {
-          return { count: 0 };
-        },
-
-        template: '#counter-template'
-      });
-
-
+      
+      Vue.http.headers.common['X-ApiKey'] = '9ed4efc320174f3e89ba157849a32923';
+      
       new Vue({
-        el: '#app'
+        el: '#app',
+
+        methods: {
+          getPaises: function(e){
+            
+            e.preventDefault();
+            this.$http.get('https://api.despegar.com/v3/countries?product=HOTELS&language=ES',function(data, status, request){
+              alert('aaa');
+            });
+          },
+        }
       });
-
-
 
     </script>
 
