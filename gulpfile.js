@@ -17,7 +17,7 @@ gulp.task('styles', function () {
 });
 
 gulp.task('scripts', function () {
-  gulp.src(['node_modules/vue/dist/vue.min.js','node_modules/bootstrap/dist/js/bootstrap.js','src/js/**/*.js'])
+  gulp.src(['node_modules/vue/dist/vue.min.js','node_modules/vue-resource/dist/vue-resource.min.js','node_modules/bootstrap/dist/js/bootstrap.js','src/js/**/*.js'])
     .pipe(plumber())
     .pipe(concat('despegarapi.min.js'))
     .pipe(uglify())
