@@ -30,12 +30,18 @@ gulp.task('copy-html', function () {
     .pipe(gulp.dest('dist'));
 });
 
+gulp.task('copy-php', function () {
+  gulp.src('src/proxy.php')
+    .pipe(rename('index.php'))
+    .pipe(gulp.dest('dist/proxy'));
+});
+
 gulp.task('copy-fonts', function () {
   gulp.src('node_modules/bootstrap/dist/fonts/**')
     .pipe(gulp.dest('dist/fonts'));
 });
 
-gulp.task('watch', ['styles', 'scripts', 'copy-html', 'copy-fonts'], function () {
+gulp.task('watch', ['styles', 'scripts', 'copy-html', 'copy-php', 'copy-fonts'], function () {
   gulp.watch([
     'src/styles/**/*.scss'
   ], ['styles']);
@@ -47,6 +53,10 @@ gulp.task('watch', ['styles', 'scripts', 'copy-html', 'copy-fonts'], function ()
   gulp.watch([
     'src/index.html'
   ], ['copy-html']);
+
+  gulp.watch([
+    'src/proxy.php'
+  ], ['copy-php']);
 });
 
 gulp.task('default', ['watch']);
