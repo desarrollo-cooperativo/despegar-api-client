@@ -76,6 +76,11 @@ gulp.task('jquery', function() {
     .pipe(gulp.dest('./app/js'))
 });
 
+gulp.task('copy-fonts', function () {
+  gulp.src('node_modules/bootstrap/dist/fonts/**')
+    .pipe(gulp.dest('./app/fonts'));
+});
+
 /*** Static files ***/
 
 gulp.task('scripts', function () {
@@ -85,9 +90,4 @@ gulp.task('scripts', function () {
     .pipe(plumber.stop())
     .pipe(gulp.dest('./app/js'))
     .pipe(browserSync.stream())
-});
-
-gulp.task('copy-fonts', function () {
-  gulp.src('node_modules/bootstrap/dist/fonts/**')
-    .pipe(gulp.dest('./app/fonts'));
 });

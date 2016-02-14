@@ -3,14 +3,13 @@ new Vue({
 
   methods: {
     getPaises: function(e){
-
+      console.log(1)
+      console.log(this)
+      // Vue.http.headers.common['X-ApiKey'] = '9ed4efc320174f3e89ba157849a32923';
       e.preventDefault();
-
-      Vue.http.headers.common['X-ApiKey'] = '9ed4efc320174f3e89ba157849a32923';
-      
-      this.$http.get('https://api.despegar.com/v3/countries?product=HOTELS&language=ES',function(data, status, request){
-        alert('aaa');
-      });
+      // this.$http.post('proxy/',{'method':'countries','qs':'?product=HOTELS&language=ES'},function(data, status, request){
+      //   console.log(data);
+      // });
     },
   }
 });

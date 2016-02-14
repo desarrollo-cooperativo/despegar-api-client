@@ -82,8 +82,8 @@
           getPaises: function(e){
             
             e.preventDefault();
-            this.$http.get('https://api.despegar.com/v3/countries?product=HOTELS&language=ES',function(data, status, request){
-              alert('aaa');
+            this.$http.post('proxy/',{'method':'countries','qs':'?product=HOTELS&language=ES'},function(data, status, request){
+              console.log(data);
             });
           },
         }
