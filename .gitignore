@@ -12,4 +12,6 @@ Thumbs.db
 .sass-cache
 node_modules
 dist
-build
+app/css
+app/fonts
+app/js

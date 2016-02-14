@@ -15,7 +15,7 @@ var onError = function (err) {
 
 gulp.task('default', ['browser-sync', 'watch']);
 
-gulp.task('watch', ['styles', 'scripts', 'copy-fonts', 'bootstrap-css', 'bootstrap-js', 'vue-js', 'jquery'], function () {
+gulp.task('watch', ['styles', 'scripts', 'copy-fonts', 'bootstrap-css', 'bootstrap-js', 'vue-js', 'vue-resource', 'jquery'], function () {
   gulp.watch([
     'app/styles/**/*.scss'
   ], ['styles']);
@@ -68,6 +68,11 @@ gulp.task('bootstrap-js', function() {
 
 gulp.task('vue-js', function() {
   gulp.src(['node_modules/vue/dist/vue.min.js'])
+    .pipe(gulp.dest('./app/js'))
+});
+
+gulp.task('vue-resource', function() {
+  gulp.src(['node_modules/vue-resource/dist/vue-resource.min.js'])
     .pipe(gulp.dest('./app/js'))
 });
 
