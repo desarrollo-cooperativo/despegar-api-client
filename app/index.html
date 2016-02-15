@@ -1,74 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>API despegar</title>
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
-    <link rel="stylesheet" type="text/css" href="css/app.css">
-    <script src="js/jquery.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/vue.min.js"></script>
-    <script src="js/vue-resource.min.js"></script>
+  <meta charset="UTF-8">
+  <title>API despegar</title>
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="css/app.css">
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/vue.min.js"></script>
+  <script src="js/vue-resource.min.js"></script>
 </head>
 <body>
-  <div class="container-fluid form-apidespegar">
-        <div class="row">
-          <form>
-          <div class="form-group">
-            <label for="pais">Pais</label>
-            <select class="form-control" name="pais" id="pais">
-              <option>Todos</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="provincia">Provincia</label>
-            <select class="form-control" name="provincia" id="provincia">
-              <option>Todas</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="ciudad">Ciudad</label>
-            <select class="form-control" name="ciudad" id="ciudad">
-              <option>Todas</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="ciudad">Hotel</label>
-            <select class="form-control" name="hotel" id="hotel">
-              <option>Todos</option>
-            </select>
-          </div>
-          <div class="form-group">
-          <label>Estrellas</label>
-            <label class="radio-inline">
-              <input type="radio" name="estrellas" id="estrellas" value="1"> 1
-            </label>
-            <label class="radio-inline">
-              <input type="radio" name="estrellas" id="estrellas" value="2"> 2
-            </label>
-            <label class="radio-inline">
-              <input type="radio" name="estrellas" id="estrellas" value="3"> 3
-            </label>
-            <label class="radio-inline">
-              <input type="radio" name="estrellas" id="estrellas" value="4"> 4
-            </label>
-            <label class="radio-inline">
-              <input type="radio" name="estrellas" id="estrellas" value="5"> 5
-            </label>
-          </div>
-          <button type="submit" class="btn btn-default">Buscar</button>
-        </form>
-        </div>
+  <div class="container-fluid form-apidespegar" id="app">
+    <div class="row">
+      <div class="form-group">
+        <label for="pais">Pais</label>
+        <select v-model="country" class="form-control" name="country" id="country" v-on:change="getProvinces">
+          <option v-for="option in countries.items" v-bind:value="option.id">{{ option.descriptions.es }}</option>
+        </select>
       </div>
-
-    <div id="app" class="container-fluid">
-
-    <button @click="getPaises">Call</button>
-
-
-    <div class="alert alert-success" role="alert">Esto no funciona</div>
-
+      <div class="form-group">
+        <label for="provincia">Provincia</label>
+        <select v-model="province" class="form-control" name="province" id="province"  v-on:change="getCities">
+          <option v-for="option in provinces.items" v-bind:value="option.id">{{ option.descriptions.es }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="ciudad">Ciudad</label>
+        <select v-model="city" class="form-control" name="city" id="city">
+          <option v-for="option in cities.items" v-bind:value="option.id">{{ option.descriptions.es }}</option>
+        </select>
+      </div>
+      <button class="btn btn-default" v-on:click="getHotels">Buscar</button>
     </div>
+
+    <div class="row">
+      <ul id="results">
+        <li v-for="hotel in hotels.items">
+          {{ hotel.name }}
+        </li>
+      </ul>
+    </div>
+  </div>
 </body>
 <script src="js/app.js"></script>
 </html>
