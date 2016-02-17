@@ -9,6 +9,7 @@
   <script src="js/bootstrap.min.js"></script>
   <script src="js/vue.min.js"></script>
   <script src="js/vue-resource.min.js"></script>
+  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 </head>
 <body>
   <div class="container-fluid form-apidespegar" id="app">
@@ -31,6 +32,10 @@
           <option v-for="option in cities.items" v-bind:value="option.id">{{ option.descriptions.es }}</option>
         </select>
       </div>
+
+      <input type="text" v-datepicker="from_date" />
+      <input type="text" v-datepicker="to_date" />
+
       <button class="btn btn-default" v-on:click="getHotels">Buscar</button>
     </div>
 

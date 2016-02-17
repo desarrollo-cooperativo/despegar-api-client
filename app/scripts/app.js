@@ -1,3 +1,20 @@
+Vue.directive('datepicker', {
+  bind: function () {
+    var vm = this.vm;
+    var key = this.expression;
+    $(this.el).datepicker({
+      dateFormat: 'dd-mm-yy',
+      onSelect: function (date) {
+        //TODO: Check if date is valid.
+        vm.$set(key, date);
+      }
+    });
+  },
+  update: function (val) {
+    $(this.el).datepicker('setDate', val);
+  }
+});
+
 new Vue({
   el: '#app',
   data: {
@@ -7,7 +24,9 @@ new Vue({
     countries:  null,
     provinces:  null,
     cities:     null,
-    hotels:     null
+    hotels:     null,
+    from_date:  null,
+    to_date:    null
   },
 
   created: function () {
@@ -67,5 +86,5 @@ new Vue({
       // TODO: Add a popup with an error message.
       return null;
     },
-  }
+  },
 });
