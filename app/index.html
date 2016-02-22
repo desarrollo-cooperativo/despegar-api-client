@@ -32,17 +32,56 @@
           <option v-for="option in cities.items" v-bind:value="option.id">{{ option.descriptions.es }}</option>
         </select>
       </div>
-
-      <input type="text" v-datepicker="from_date" />
-      <input type="text" v-datepicker="to_date" />
-
-      <button class="btn btn-default" v-on:click="getHotels">Buscar</button>
+      <div class="form-group-inline">
+          <label for="from_date">Entrada</label>
+          <input name="from_date" type="text" v-datepicker="from_date" />
+          <label for="to_date">Salida</label>
+          <input name="to_date" type="text" v-datepicker="to_date" />
+      </div>
+      <div class="form-group">
+          <label for="rooms">Habitaciones</label>
+          <select name="rooms" v-model="rooms">
+            <option value="1" selected="selected">1 Habitación</option>
+            <option value="2">2 Habitaciones</option>
+            <option value="3">3 Habitaciones</option>
+            <option value="4">4 Habitaciones</option>
+          </select>
+      </div>
+      <div class="form-group-inline">
+          <label for="adults">Adultos</label>
+          <select name="adults" v-model="adults">
+            <option value="1">1</option>
+            <option value="2" selected="selected">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+          </select>
+          <label for="adults">Menores</label>
+          <select name="children" v-model="children">
+            <option value="0" selected="selected">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+          </select>
+      </div>
+      <button class="btn btn-default" v-on:click="getAvailableHotels">Buscar</button>
     </div>
 
     <div class="row">
       <ul id="results">
-        <li v-for="hotel in hotels.items">
-          {{ hotel.name }}
+        <li class="hotel" v-for="res in hotels">
+          <h1>{{ res.hotel.name }} </h1>
+          <div class="hotel_type" v-for="ht in hotel_types" v-if="res.hotel.hotel_type_id==ht.value">{{ ht.label }}</div>
+          <preciodesde :hotel="res" :cheapest-night-prices="cheapest_night_prices"></preciodesde>
+          <formapago :hotel="res" :hotel-payment-types="hotel_payment_types"></formapago>
+          <detallesprincipales :hotel="res" :hotels-details="hotels_details"></detallesprincipales>
+          <amenities :hotel="res" :amenities="amenities"></amenities> 
         </li>
       </ul>
     </div>
