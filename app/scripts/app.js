@@ -125,6 +125,7 @@ new Vue({
     hotel_payment_types: function(){
           
           var hptypes = [];
+          var hotel = null;
 
           for (h in this.hotels){
             hotel = this.hotels[h];            
@@ -132,7 +133,7 @@ new Vue({
             for(p in hotel.payment_types){
               pt = hotel.payment_types[p];
               if(pt == 'prepaid'){
-                if(hotel.max_installments_quantity == 1){
+                if(hotel.max_installment_quantity == 1){
                   pt = 'prepaid_one_payment';
                 } else {
                   pt = 'prepaid_installments';
@@ -141,7 +142,13 @@ new Vue({
               for( pp in this.payment_types){
                 ppt = this.payment_types[pp];
                 if(ppt.value==pt){
-                  ptypes.push(ppt.label)
+                  var separator = (ptypes.length>0)?', ':'';
+                  if(pt=='prepaid_installments'){
+                    ptypes.push(separator+'Hasta en '+hotel.max_installment_quantity+' cuotas');
+                  } else {
+                    ptypes.push(separator+ppt.label)
+                  }
+                  
                 }
               }
               
@@ -211,7 +218,8 @@ new Vue({
       this.$http.post('proxy/', {'method':'hotels','qs':'?ids='+this.hotels_ids.toString()+'&language=es&options=amenities,fees,information,notices,room_types(information),extra_details'}, {'emulateJSON' : true}).then(
         function(response){
           self.hotels_details = response.data
-          $('#results-container').loadingOverlay('remove');
+          $('#loading-spinner').loadingOverlay('remove');
+          $('#results-container').show();
         },
         this.errorCallback
       );
@@ -219,8 +227,9 @@ new Vue({
     
     getAvailableHotels: function() {
       var self = this;
-      $('#results-container').loadingOverlay();
-
+      $('#results-container').hide();
+      $('#loading-spinner').loadingOverlay({loadingText: 'Un momento por favor, estamos buscando hoteles para vos'});
+      
       this.$http.post('proxy/', {'method':'hotels/availabilities','qs':'?currency=ARS&sorting=total_price_ascending&country_code=AR&language=es&destination=' + this.city+'&distribution='+this.distribution+'&checkin_date='+this.from_date_api+'&checkout_date='+this.to_date_api}, {'emulateJSON' : true}).then(
         function(response){
           self.amenities = response.data.facets[0].values;
