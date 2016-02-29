@@ -18,7 +18,7 @@ Vue.directive('datepicker', {
 Vue.component('detallesprincipales',{
   props: ['hotel','hotelsDetails'],
 
-  template: '<h2>Información</h2><div v-for="hot in hotelsDetails" v-if="hot.id==hotel.id"><img src="{{ hot.main_picture.url }}" alt=""><div class="hotel_address" data-lat="{{ hot.location.latitude }}" data-lon="{{ hot.location.longitude }}">Dirección: {{ hot.location.address }}</div><div>{{ hot.information.es }}</div></div>',
+  template: '<div v-for="hot in hotelsDetails" v-if="hot.id==hotel.id" class="hotel-desc "><div class="hotel-address" data-lat="{{ hot.location.latitude }}" data-lon="{{ hot.location.longitude }}"><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> {{ hot.location.address }}</div><div>{{ hot.information.es }}</div></div>',
 
 });
 
@@ -26,21 +26,21 @@ Vue.component('detallesprincipales',{
 Vue.component('preciodesde',{
   props: ['hotel','cheapestNightPrices'],
 
-  template: '<h2 v-for="cnp in cheapestNightPrices" v-if="cnp.h==hotel.id">Reserva desde: {{ cnp.moneda }} {{ cnp.precio_desde }}</h2>',
+  template: '<div class="btn btn-danger btn-lg" v-for="cnp in cheapestNightPrices" v-if="cnp.h==hotel.id">Reserva desde: {{ cnp.moneda }} {{ cnp.precio_desde.toFixed(2) }}</div>',
 
 });
 
 Vue.component('formapago',{
   props: ['hotel','hotelPaymentTypes'],
 
-  template: '<h2>Forma de pago</h2><ul v-for="hpt in hotelPaymentTypes" v-if="hpt.h==hotel.id"><li v-for="p in hpt.pt">{{ p }}</li></ul>',
+  template: '<div class="forma_de_pago"><strong>Forma de pago: <span v-for="hpt in hotelPaymentTypes" v-if="hpt.h==hotel.id"><span v-for="p in hpt.pt">{{ p }}</span></span></strong></div>',
 
 });
 
 Vue.component('amenities',{
   props: ['hotel','amenities'],
 
-  template: '<h2>Amenitites</h2><div class="amenity" v-for="ame_hotel in hotel.hotel.amenity_ids"><span v-for="ame in amenities" v-if="ame.value==ame_hotel">{{ ame.label }}</span></div> ',
+  template: '<div class"amenities"><div class="amenity btn btn-warning btn-xs" v-for="ame_hotel in hotel.hotel.amenity_ids"><span v-for="ame in amenities" v-if="ame.value==ame_hotel">{{ ame.label }}</span></div> </div>',
 
 });
 
@@ -208,9 +208,10 @@ new Vue({
     getHotelsDetails: function() {
       var self = this;
 
-      this.$http.post('proxy/', {'method':'hotels','qs':'?ids='+this.hotels_ids.toString()+'&language=es&options=amenities,fees,pictures,information,notices,room_types(amenities,pictures,information),extra_details'}, {'emulateJSON' : true}).then(
+      this.$http.post('proxy/', {'method':'hotels','qs':'?ids='+this.hotels_ids.toString()+'&language=es&options=amenities,fees,information,notices,room_types(information),extra_details'}, {'emulateJSON' : true}).then(
         function(response){
           self.hotels_details = response.data
+          $('#results-container').loadingOverlay('remove');
         },
         this.errorCallback
       );
@@ -218,7 +219,8 @@ new Vue({
     
     getAvailableHotels: function() {
       var self = this;
-      
+      $('#results-container').loadingOverlay();
+
       this.$http.post('proxy/', {'method':'hotels/availabilities','qs':'?currency=ARS&sorting=total_price_ascending&country_code=AR&language=es&destination=' + this.city+'&distribution='+this.distribution+'&checkin_date='+this.from_date_api+'&checkout_date='+this.to_date_api}, {'emulateJSON' : true}).then(
         function(response){
           self.amenities = response.data.facets[0].values;

@@ -5,15 +5,52 @@
   <title>API despegar</title>
   <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
   <link rel="stylesheet" type="text/css" href="css/app.css">
+  <link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.11.4/themes/ui-lightness/jquery-ui.css">
   <script src="js/jquery.min.js"></script>
+  <script src="js/jquery-loading-overlay.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <script src="js/vue.min.js"></script>
   <script src="js/vue-resource.min.js"></script>
   <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <style type="text/css">
+ul#results {
+  list-style: none;
+}
+
+li.hotel {
+  color:#fff;
+  margin: 10px auto;
+  background-color: #e3f1ff;
+    background-image: linear-gradient(#d6ebff, #7baddb);
+}
+div.hotel-card{
+    min-height: 300px; 
+}
+div.hotel-card-payment{
+  padding-top: 100px;
+}
+
+div.amenity {
+  margin: 2px;
+}
+
+div.hotel-desc {
+  background-color: rgba(0, 0, 0, 0.35);
+  padding:5px;
+}
+div.hotel-address {
+  margin: 5px 0;
+}
+.loading{
+  background-color: rgba(0, 0, 0, 0.88);
+}
+</style>
+
 </head>
 <body>
   <div class="container-fluid form-apidespegar" id="app">
-    <div class="row">
+    <div class="row col-xs-12 col-sm-2">
+      <!--
       <div class="form-group">
         <label for="pais">Pais</label>
         <select v-model="country" class="form-control" name="country" id="country" v-on:change="getProvinces">
@@ -32,14 +69,18 @@
           <option v-for="option in cities.items" v-bind:value="option.id">{{ option.descriptions.es }}</option>
         </select>
       </div>
-      <div class="form-group-inline">
-          <label for="from_date">Entrada</label>
-          <input name="from_date" type="text" v-datepicker="from_date" />
-          <label for="to_date">Salida</label>
-          <input name="to_date" type="text" v-datepicker="to_date" />
+      -->
+      <div class="form-group">
+          <input name="destino" type="text" placeholder="Mar de las Pampas, Buenos Aires" readonly="readonly" />
       </div>
       <div class="form-group">
-          <label for="rooms">Habitaciones</label>
+          <input name="from_date" type="text" v-datepicker="from_date" placeholder="Entrada" />
+      </div>
+      <div class="form-group">
+          <input name="to_date" type="text" v-datepicker="to_date" placeholder="Salida" />
+      </div>
+      <div class="form-group">
+          <label for="rooms">Hab.</label>
           <select name="rooms" v-model="rooms">
             <option value="1" selected="selected">1 Habitación</option>
             <option value="2">2 Habitaciones</option>
@@ -47,7 +88,7 @@
             <option value="4">4 Habitaciones</option>
           </select>
       </div>
-      <div class="form-group-inline">
+      <div class="form-group">
           <label for="adults">Adultos</label>
           <select name="adults" v-model="adults">
             <option value="1">1</option>
@@ -59,7 +100,9 @@
             <option value="7">7</option>
             <option value="8">8</option>
           </select>
-          <label for="adults">Menores</label>
+      </div>
+      <div class="form-group">
+        <label for="adults">Menores</label>
           <select name="children" v-model="children">
             <option value="0" selected="selected">0</option>
             <option value="1">1</option>
@@ -73,15 +116,19 @@
       <button class="btn btn-default" v-on:click="getAvailableHotels">Buscar</button>
     </div>
 
-    <div class="row">
-      <ul id="results">
-        <li class="hotel" v-for="res in hotels">
-          <h1>{{ res.hotel.name }} </h1>
-          <div class="hotel_type" v-for="ht in hotel_types" v-if="res.hotel.hotel_type_id==ht.value">{{ ht.label }}</div>
+    <div id="results-container" class="row col-xs-12 col-sm-10">
+      <ul id="results" class="container-fluid">
+        <li class="hotel row" v-for="res in hotels">
+          <div class="hotel-card col-xs-12 col-sm-8" v-for="hot in hotels_details" v-if="hot.id==res.id" style="background: url('{{ hot.main_picture.url }}') no-repeat top left;background-size:100% 100%;">
+          <h1>{{ res.hotel.name }} <span class="hotel_type btn-info btn-xs" v-for="ht in hotel_types" v-if="res.hotel.hotel_type_id==ht.value">{{ ht.label }}</span></h1>
+          
+          <detallesprincipales :hotel="res" :hotels-details="hotels_details"></detallesprincipales>
+          <!--amenities :hotel="res" :amenities="amenities"></amenities--> 
+          </div>
+          <div class="hotel-card-payment col-xs-12 col-sm-4 text-center">
           <preciodesde :hotel="res" :cheapest-night-prices="cheapest_night_prices"></preciodesde>
           <formapago :hotel="res" :hotel-payment-types="hotel_payment_types"></formapago>
-          <detallesprincipales :hotel="res" :hotels-details="hotels_details"></detallesprincipales>
-          <amenities :hotel="res" :amenities="amenities"></amenities> 
+          </div>
         </li>
       </ul>
     </div>
