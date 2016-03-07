@@ -21,10 +21,16 @@ li.hotel {
   color:#fff;
   margin: 10px auto;
   background-color: #e3f1ff;
-    background-image: linear-gradient(#d6ebff, #7baddb);
+  background-image: linear-gradient(#d6ebff, #7baddb);
 }
 div.hotel-card{
     min-height: 300px; 
+}
+div.hotel-card h1{
+    color:#fff;
+    background-color: rgba(0, 0, 0, 0.35);
+    padding:5px;
+    margin-bottom:0;
 }
 div.hotel-card-payment{
   padding-top: 100px;
@@ -127,6 +133,15 @@ div.hotel-address {
   content: "\e000";
   font-family: "demo";
 }
+span.estrellas {
+  color: #ffd700;
+  font-size: 10px;
+  padding:2px;
+}
+img.rp{
+  width: 100px;
+  height:auto;
+}
 </style>
 
 </head>
@@ -200,14 +215,14 @@ div.hotel-address {
     </div>
 
     <div id="loading-spinner"></div>
-    <div id="results-container" class="row col-xs-12 col-sm-10">
+    <div id="results-container" v-show="hoteldetallado == null && hotels_details.length" class="row col-xs-12 col-sm-10">
       <ul id="results" class="container-fluid">
         <li class="hotel row" v-for="res in hotels">
           <div class="hotel-card col-xs-12 col-sm-8" v-for="hot in hotels_details" v-if="hot.id==res.id" style="background: url('{{ hot.main_picture.url }}') no-repeat top left;background-size:100% 100%;">
-          <h1>{{ res.hotel.name }} <span class="hotel_type btn-info btn-xs" v-for="ht in hotel_types" v-if="res.hotel.hotel_type_id==ht.value">{{ ht.label }}</span></h1>
+          <h1>{{ res.hotel.name }} <span class="hotel_type btn-info btn-xs" v-for="ht in hotel_types" v-if="res.hotel.hotel_type_id==ht.value">{{ ht.label }}</span><span class="glyphicon glyphicon-star estrellas" aria-hidden="true" v-for="n in hot.stars"></span></h1>
           
           <detallesprincipales :hotel="res" :hotels-details="hotels_details"></detallesprincipales>
-          <!--amenities :hotel="res" :amenities="amenities"></amenities--> 
+          
           </div>
           <div class="hotel-card-payment col-xs-12 col-sm-4 text-center">
           <preciodesde :hotel="res" :cheapest-night-prices="cheapest_night_prices"></preciodesde>
@@ -215,6 +230,64 @@ div.hotel-address {
           </div>
         </li>
       </ul>
+    </div>
+    <div id="hotel-view" v-show="hoteldetallado != null" class="row col-xs-12 col-sm-10">
+      <ul id="results" class="container-fluid">
+        <li class="hotel row" v-for="res in hotels" v-if="res.id==hoteldetallado.id">
+          <div class="hotel-card col-xs-12 " v-for="hot in hotels_details" v-if="hot.id==res.id">
+          <div class="volver"><button v-on:click="volver" class="btn btn-info"><< Volver al listado de hoteles</button></div>
+          <h1>{{ res.hotel.name }} <span class="hotel_type btn-info btn-xs" v-for="ht in hotel_types" v-if="res.hotel.hotel_type_id==ht.value">{{ ht.label }}</span><span class="glyphicon glyphicon-star estrellas" aria-hidden="true" v-for="n in hot.stars"></span></h1>
+          <div id="myCarousel" class="carousel slide" data-ride="carousel">
+            <!-- Indicators -->
+            <ol class="carousel-indicators">
+              <li data-target="#myCarousel" v-for="(idx, pic) in hot.pictures" v-if="idx < 11" data-slide-to="{{idx}}" class="{{(idx == 0)?'active':'' }}"></li>
+            </ol>
+            <div class="carousel-inner" role="listbox">
+              <div v-for="(idx, pic) in hot.pictures" v-if="idx < 11" class="{{(idx == 0)?'active':'' }} item">
+                <img class="first-slide" src="{{pic.url}}" alt="">
+              </div>
+            </div>
+            <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+              <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+              <span class="sr-only">Previous</span>
+            </a>
+            <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+              <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+              <span class="sr-only">Next</span>
+            </a>
+          </div><!-- /.carousel -->
+          
+          
+
+          <detallesprincipales :hotel="res" :hotels-details="hotels_details"></detallesprincipales>
+          <hr>
+          <amenities :hotel="res" :amenities="amenities"></amenities> 
+          <hr>
+          <h3>Opciones: {{ hoteldetallado.roompacks_simple.length }}</h3>
+          <table class="table table-responsive">
+            <thead>
+              <th>Tipo de habitación</th>
+              <th>Régimen de comidas</th>
+              <th>Políticas de cancelación</th>
+              <th>Habitación por noche</th>
+            </thead>
+            <tr v-for="rp in hoteldetallado.roompacks_simple">
+              <td>{{rp.rooms[0].name}}<br><img class="rp" src="{{rp.imgurl}}" /><br>Capacidad max. {{rp.rooms[0].capacity.max}}</td>
+              <td>{{rp.meal_plan_desc}}</td>
+              <td>{{rp.cancellation_policy.text}}</td>
+              <td>
+              <button class="btn btn-danger">Comprar ahora ${{rp.price_detail.nightly.subtotal}}</button>
+              <formapago :hotel="res" :hotel-payment-types="hotel_payment_types"></formapago>
+              </td>
+            </tr>
+          </table>
+          <hr>
+          <iframe width="300" height="170" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q={{ hot.location.latitude }},{{ hot.location.longitude }}&hl=es;z=14&output=embed"></iframe><br /><small><a href="https://maps.google.com/maps?q={{ hot.location.latitude }},{{ hot.location.longitude }}&hl=es;z=14&output=embed" style="color:#0000FF;text-align:left" target="_blank">Agrandar el mapa</a></small>
+          </div>
+        </li>
+      </ul>
+      <div>
+      </div>
     </div>
   </div>
 </body>
