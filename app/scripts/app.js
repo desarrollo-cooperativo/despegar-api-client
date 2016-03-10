@@ -22,12 +22,16 @@ Vue.component('detallesprincipales',{
 
 });
 
-
 Vue.component('preciodesde',{
   props: ['hotel','cheapestNightPrices'],
 
-  template: '<div class="btn btn-danger btn-lg" v-for="cnp in cheapestNightPrices" v-if="cnp.h==hotel.id">Reserva desde: {{ cnp.moneda }} {{ cnp.precio_desde.toFixed(2) }}</div>',
+  template: '<div class="btn btn-danger btn-lg" v-on:click="startReservation" v-for="cnp in cheapestNightPrices" v-if="cnp.h==hotel.id">Reserva desde: {{ cnp.moneda }} {{ cnp.precio_desde.toFixed(2) }}</div>',
 
+  methods: {
+    startReservation: function() {
+      this.$dispatch('startReservation', this.hotel.id)
+    }
+  }
 });
 
 Vue.component('formapago',{
@@ -43,7 +47,6 @@ Vue.component('amenities',{
   template: '<div class"amenities"><div class="amenity btn btn-warning btn-xs" v-for="ame_hotel in hotel.hotel.amenity_ids"><span v-for="ame in amenities" v-if="ame.value==ame_hotel">{{ ame.label }}</span></div> </div>',
 
 });
-
 
 new Vue({
   el: '#app',
@@ -75,6 +78,7 @@ new Vue({
         return oDate.substr(6,4)+'-'+oDate.substr(3,2)+'-'+oDate.substr(0,2);
       }
     },
+
     to_date_api: function(){
       oDate = this.to_date;
       if (oDate === null && typeof oDate === "object") {
@@ -83,6 +87,7 @@ new Vue({
         return oDate.substr(6,4)+'-'+oDate.substr(3,2)+'-'+oDate.substr(0,2);
       }
     },
+
     distribution: function(){
       var dist = this.adults;
       if (this.children !== null){
@@ -95,6 +100,7 @@ new Vue({
       }
       return dist;
     },
+
     hotels_ids: function(){
       var hids = [];
 
@@ -110,7 +116,7 @@ new Vue({
 
       for (h in this.hotels){
         var hotel = this.hotels[h];
-        var precio = -1; 
+        var precio = -1;
         var moneda = null;
         for (r in hotel.roompacks){
           rp = hotel.roompacks[r];
@@ -123,42 +129,41 @@ new Vue({
     },
 
     hotel_payment_types: function(){
-          
-          var hptypes = [];
-          var hotel = null;
+      var hptypes = [];
+      var hotel = null;
 
-          for (h in this.hotels){
-            hotel = this.hotels[h];            
-            ptypes = [];
-            for(p in hotel.payment_types){
-              pt = hotel.payment_types[p];
-              if(pt == 'prepaid'){
-                if(hotel.max_installment_quantity == 1){
-                  pt = 'prepaid_one_payment';
-                } else {
-                  pt = 'prepaid_installments';
-                }
-              }
-              for( pp in this.payment_types){
-                ppt = this.payment_types[pp];
-                if(ppt.value==pt){
-                  var separator = (ptypes.length>0)?', ':'';
-                  if(pt=='prepaid_installments'){
-                    ptypes.push(separator+'Hasta en '+hotel.max_installment_quantity+' cuotas');
-                  } else {
-                    ptypes.push(separator+ppt.label)
-                  }
-                  
-                }
-              }
-              
+      for (h in this.hotels){
+        hotel = this.hotels[h];
+        ptypes = [];
+        for(p in hotel.payment_types){
+          pt = hotel.payment_types[p];
+          if(pt == 'prepaid'){
+            if(hotel.max_installment_quantity == 1){
+              pt = 'prepaid_one_payment';
+            } else {
+              pt = 'prepaid_installments';
             }
+          }
+          for( pp in this.payment_types){
+            ppt = this.payment_types[pp];
+            if(ppt.value==pt){
+              var separator = (ptypes.length>0)?', ':'';
+              if(pt=='prepaid_installments'){
+                ptypes.push(separator+'Hasta en '+hotel.max_installment_quantity+' cuotas');
+              } else {
+                ptypes.push(separator+ppt.label)
+              }
+
+            }
+          }
+
+        }
 
 
-            hptypes.push({h:hotel.id,pt:ptypes});
-          } 
-          return hptypes;
-        },
+        hptypes.push({h:hotel.id,pt:ptypes});
+      }
+      return hptypes;
+    },
   },
 
   created: function () {
@@ -224,12 +229,12 @@ new Vue({
         this.errorCallback
       );
     },
-    
+
     getAvailableHotels: function() {
       var self = this;
       $('#results-container').hide();
       $('#loading-spinner').loadingOverlay({loadingText: 'Un momento por favor, estamos buscando hoteles para vos'});
-      
+
       this.$http.post('proxy/', {'method':'hotels/availabilities','qs':'?currency=ARS&sorting=total_price_ascending&country_code=AR&language=es&destination=' + this.city+'&distribution='+this.distribution+'&checkin_date='+this.from_date_api+'&checkout_date='+this.to_date_api}, {'emulateJSON' : true}).then(
         function(response){
           self.amenities = response.data.facets[0].values;
@@ -241,7 +246,98 @@ new Vue({
         this.errorCallback
       );
     },
-  
+
+    startReservation: function() {
+      var self = this;
+      var body = {
+        'source': {'country_code':'AR'},
+        'reservation_context': {
+          'context_language':'es',
+          'shown_currency':'ARS',
+          'threat_metrix_id':'TheValue',
+          'client_ip':'200.49.12.204',
+          'user_agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.115 Safari/537.36',
+          'base_url':'www.despegar.com.ar'
+        },
+        'keys': {"availability_token":"hsm_retrieve_documentation"}
+      };
+
+      self.bookingPromptInfo = null;
+      self.bookingId = null;
+
+      this.$http.post('proxy/', {'method':'hotels/bookings','qs':'?example=true', 'body': body}, {'emulateJSON' : true}).then(
+        function(response){
+          self.bookingId = response.data.id
+          self.getBookingForm()
+        },
+        this.errorCallback
+      );
+    },
+
+    getBookingForm: function() {
+      var self = this;
+
+      this.$http.post('proxy/', {'method':'hotels/bookings/'+self.bookingId+'/forms','qs':'?example=true'}, {'emulateJSON' : true}).then(
+        function(response){
+          self.bookingPromptInfo = response.data;
+          self.promptUserForInfo();
+        },
+        this.errorCallback
+      );
+    },
+
+    promptUserForInfo: function() {
+      var self = this;
+      var body = {
+        "payment_method_choice": "1",
+        "form": {
+          "passengers": [{
+            "first_name":"Test",
+            "last_name":"Booking"
+          }],
+          "payment": {
+            "credit_card": {
+              "number":"4242424242424242",
+              "expiration":"2020-12",
+              "security_code":"123",
+              "owner_name":"Test Booking",
+              "owner_document": {
+                "type":"LOCAL",
+                "number":"12345678"
+              },
+              "card_code":"VI",
+              "card_type":"CREDIT"
+            },
+            "billing_address":{
+              "country":"AR",
+              "state":"Buenos Aires",
+              "city":"BUE",
+              "street":"Calle Falsa",
+              "number":"123",
+              "floor":"1",
+              "department":"G",
+              "postal_code":"1234"
+            }
+          },
+          "contact":{
+            "email":"testhoteles@despegar.com",
+            "phones":[{
+              "type":"CELULAR",
+              "number":"12345678",
+              "country_code":"54",
+              "area_code":"11"
+            }]
+          }
+        }
+      }
+
+      this.$http.post('proxy/', {'method':'hotels/bookings/'+self.bookingId+'/forms/'+self.bookingPromptInfo.items[0].id,'qs':'?example=true', 'body': body, 'patch': true}, {'emulateJSON' : true}).then(
+        function(response){
+          console.log(response.data)
+        },
+        this.errorCallback
+      );
+    },
 
     successCallback: function(response) {
       return response.data
@@ -252,4 +348,10 @@ new Vue({
       return null;
     },
   },
+
+  events: {
+    'startReservation': function (hotel_id) {
+      this.startReservation();
+    }
+  }
 });
