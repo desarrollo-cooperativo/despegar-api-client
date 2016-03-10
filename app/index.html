@@ -276,7 +276,7 @@ img.rp{
               <td>{{rp.meal_plan_desc}}</td>
               <td>{{rp.cancellation_policy.text}}</td>
               <td>
-              <button class="btn btn-danger">Comprar ahora ${{rp.price_detail.nightly.subtotal}}</button>
+              <button class="btn btn-danger" v-on:click="startReservation(res.id)">Comprar ahora ${{rp.price_detail.nightly.subtotal}}</button>
               <formapago :hotel="res" :hotel-payment-types="hotel_payment_types"></formapago>
               </td>
             </tr>

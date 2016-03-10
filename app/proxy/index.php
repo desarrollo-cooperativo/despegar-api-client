@@ -4,13 +4,13 @@ define('URI','https://api.despegar.com/v3/');
 
 $method = $_POST["method"];
 $qs     = $_POST["qs"];
-$body   = $_POST["body"];
-$patch  = $_POST["patch"];
+$body   = isset($_POST["body"])?$_POST["body"]:false;
+$patch  = isset($_POST["patch"])?$_POST["patch"]:false;
 $uri    = URI.$method.$qs;
 $ch     = curl_init($uri);
 
 if($patch) {
-  curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PATCH");
+  curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PATCH");
 }
 
 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'X-ApiKey: '.APIKEY, 'Accept: application/json') );

@@ -25,12 +25,15 @@ Vue.component('detallesprincipales',{
 Vue.component('preciodesde',{
   props: ['hotel','cheapestNightPrices'],
 
-  template: '<div class="btn btn-danger btn-lg" v-on:click="startReservation" v-for="cnp in cheapestNightPrices" v-if="cnp.h==hotel.id">Reserva desde: {{ cnp.moneda }} {{ cnp.precio_desde.toFixed(2) }}</div>',
+  template: '<div class="btn btn-danger btn-lg" v-on:click="getHotelAvailability" v-for="cnp in cheapestNightPrices" v-if="cnp.h==hotel.id">Reserva desde: {{ cnp.moneda }} {{ cnp.precio_desde.toFixed(2) }}</div>',
 
   methods: {
     startReservation: function() {
-      this.$dispatch('startReservation', this.hotel.id)
-    }
+      this.$dispatch('startReservation', this.hotel.id);
+    },
+    getHotelAvailability: function(id){
+      this.$dispatch('getHotelAvailability', this.hotel.id);
+    },
   }
 });
 
@@ -44,7 +47,7 @@ Vue.component('formapago',{
 Vue.component('amenities',{
   props: ['hotel','amenities'],
 
-  template: '<div class"amenities"><div class="amenity btn btn-warning btn-xs" v-for="ame_hotel in hotel.hotel.amenity_ids"><span v-for="ame in amenities" v-if="ame.value==ame_hotel">{{ ame.label }}</span></div> </div>',
+  template: '<div class"amenities"><h2>Amenities</h2><div class="amenity btn btn-warning btn-xs" v-for="ame_hotel in hotel.hotel.amenity_ids"><span v-for="ame in amenities" v-if="ame.value==ame_hotel">{{ ame.label }}</span></div> </div>',
 
 });
 
@@ -54,6 +57,7 @@ new Vue({
     country:    0,
     province:   0,
     city:       0,
+    meal_plans: null,
     countries:  null,
     provinces:  null,
     cities:     null,
@@ -67,6 +71,7 @@ new Vue({
     amenities:  null,
     hotel_types: null,
     payment_types: null,
+    hoteldetallado: null,
   },
 
   computed: {
@@ -168,10 +173,27 @@ new Vue({
 
   created: function () {
     //this.getCountries();
+    this.getMealPlans();
     this.city=4703;// mar de las pampas
   },
 
   methods: {
+
+    volver: function(){
+      this.hoteldetallado= null;
+    },
+
+    getMealPlans: function(){
+
+    var self = this;
+
+      this.$http.post('proxy/', {'method':'hotels/meal-plans','qs':''}, {'emulateJSON' : true}).then(
+        function(response){
+          self.meal_plans = response.data
+        },
+        this.errorCallback
+      );
+    },
 
     getCountries: function() {
       var self = this;
@@ -216,11 +238,56 @@ new Vue({
         this.errorCallback
       );
     },
+    getHotelAvailability: function(id) {
+      var self = this;
+      
+      this.$http.post('proxy/', {'method':'hotels/availabilities/'+id,'qs':'?country_code=AR&currency=ARS&language=es&distribution='+this.distribution+'&checkin_date='+this.from_date_api+'&checkout_date='+this.to_date_api}, {'emulateJSON' : true}).then(
+        function(response){
+          self.hoteldetallado = response.data;
+          var rp_simples = [];
+          var ro_anterior = 0;
+          for(i in response.data.roompacks){
+            var rp = response.data.roompacks[i];
+            for(j in rp.rooms){
+              var ro = rp.rooms[j]; 
+              //para no repetir cuartos en listado
+              if(ro.room_code != ro_anterior){
+                //traer la descripcion del meal plan
+                for (k in this.meal_plans){
+                  mp = this.meal_plans[k];
+                  if (rp.meal_plan.id == mp.id){
+                    rp.meal_plan_desc = mp.descriptions.es;
+                    break;
+                  }
+                }
+                //imagen
+                for(l in this.hotels_details){
+                  var hd = this.hotels_details[l];
+                  if(hd.id==id){
+                    for (m in hd.room_types){
+                        rt = hd.room_types[m];
+                        if(rt.id == ro.room_code){
+                          rp.imgurl = rt.pictures[0].url;
+                          break;
+                        }
+                    }
+                  }
+                }
+                rp_simples.push(rp);
+                ro_anterior = ro.room_code;
+              }
+            }
+          }
+          this.hoteldetallado.roompacks_simple = rp_simples;
+        },
+        this.errorCallback
+      );
+    },
 
     getHotelsDetails: function() {
       var self = this;
 
-      this.$http.post('proxy/', {'method':'hotels','qs':'?ids='+this.hotels_ids.toString()+'&language=es&options=amenities,fees,information,notices,room_types(information),extra_details'}, {'emulateJSON' : true}).then(
+      this.$http.post('proxy/', {'method':'hotels','qs':'?ids='+this.hotels_ids.toString()+'&language=es&options=amenities,fees,information,pictures,notices,room_types(information,pictures),extra_details'}, {'emulateJSON' : true}).then(
         function(response){
           self.hotels_details = response.data
           $('#loading-spinner').loadingOverlay('remove');
@@ -247,7 +314,7 @@ new Vue({
       );
     },
 
-    startReservation: function() {
+    startReservation: function(hotel_id) {
       var self = this;
       var body = {
         'source': {'country_code':'AR'},
@@ -352,6 +419,9 @@ new Vue({
   events: {
     'startReservation': function (hotel_id) {
       this.startReservation();
+    },
+    'getHotelAvailability': function(hotel_id){
+      this.getHotelAvailability(hotel_id);
     }
   }
 });
