@@ -12,141 +12,45 @@
   <script src="js/vue.min.js"></script>
   <script src="js/vue-resource.min.js"></script>
   <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-  <style type="text/css">
-ul#results {
-  list-style: none;
-}
-
-li.hotel {
-  color:#fff;
-  margin: 10px auto;
-  background-color: #e3f1ff;
-  background-image: linear-gradient(#d6ebff, #7baddb);
-}
-div.hotel-card{
-    min-height: 300px;
-}
-div.hotel-card h1{
-    color:#fff;
-    background-color: rgba(0, 0, 0, 0.35);
-    padding:5px;
-    margin-bottom:0;
-}
-div.hotel-card-payment{
-  padding-top: 100px;
-}
-
-div.amenity {
-  margin: 2px;
-}
-
-div.hotel-desc {
-  background-color: rgba(0, 0, 0, 0.35);
-  padding:5px;
-}
-div.hotel-address {
-  margin: 5px 0;
-}
-</style>
-<!-- overlay -->
-<style>
-@font-face {
-  font-family: "demo";
-  src: url('fonts/icons.woff') format("woff"), url('fonts/icons.ttf') format("truetype");
-}
-
-@keyframes loadingStart {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-@keyframes loading {
-  0% {
-    transform: rotate(0deg);
-  }
-  50% {
-    transform: rotate(180deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.loading {
-  position: relative;
-  pointer-events: none;
-  top:50px;
-  min-height: 300px;
-}
-
-.loading .loading-overlay {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  -webkit-animation: loadingStart 3s 300ms linear 1 both;
-  -moz-animation: loadingStart 3s 300ms linear 1 both;
-  -o-animation: loadingStart 3s 300ms linear 1 both;
-  animation: loadingStart 3s 300ms linear 1 both;
-  background: rgba(255, 255, 255, 0.5);
-  text-align: center;
-}
-.loading .loading-text {
-  font-size: 1.875rem;
-  line-height: 2.3125rem;
-  text-shadow: white 0 0 1em, white 0 0 0.5em, white 0 0 0.25em;
-  position: relative;
-  display: block;
-  text-transform: uppercase;
-  font-weight: bold;
-}
-.loading .loading-text:after {
-  content: "...";
-}
-.loading .loading-spinner {
-  position: absolute;
-  top: 50%;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: -3.9375rem auto 0;
-  color: #1a1d1d;
-  text-align: center;
-}
-.loading .loading-icon {
-  font-size: 4.8125rem;
-  line-height: 5.25rem;
-  text-shadow: rgba(255, 255, 255, 0.75) 0 0 0.5em;
-  -webkit-animation: loading 1s steps(4) infinite;
-  -moz-animation: loading 1s steps(4) infinite;
-  -o-animation: loading 1s steps(4) infinite;
-  animation: loading 1s steps(4) infinite;
-  display: block;
-  vertical-align: middle;
-}
-.loading .loading-icon:before {
-  vertical-align: middle;
-  content: "\e000";
-  font-family: "demo";
-}
-span.estrellas {
-  color: #ffd700;
-  font-size: 10px;
-  padding:2px;
-}
-img.rp{
-  width: 100px;
-  height:auto;
-}
-</style>
-
 </head>
 <body>
   <div class="container-fluid form-apidespegar" id="app">
+
+    <!-- promtUserForInfo -->
+    <div class="modal fade" id="promtUserForInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Informaci&oacute;n para realizar la reserva.</h4>
+          </div>
+          <div class="modal-body" id="promtUserFields"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-primary" v-on:click="confirmReservation()">Reservar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- promtUserForInfo -->
+
+    <!-- promtUserForInfo -->
+    <div class="modal fade" id="resultadoReserva" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Confirmaci&oacute;n de reserva.</h4>
+          </div>
+          <div class="modal-body">Reserva exitosa! disfruta de tu estad&iacute;a.<br />El n&uacute;mero de reserva es: <span id="reservationNumber"></span></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- promtUserForInfo -->
+
     <div class="row col-xs-12 col-sm-2">
       <!--
       <div class="form-group">
@@ -169,13 +73,13 @@ img.rp{
       </div>
       -->
       <div class="form-group">
-          <input name="destino" type="text" placeholder="Mar de las Pampas, Buenos Aires" readonly="readonly" />
+        <input name="destino" type="text" placeholder="Mar de las Pampas, Buenos Aires" readonly="readonly" />
       </div>
       <div class="form-group">
-          <input name="from_date" type="text" v-datepicker="from_date" placeholder="Entrada" />
+        <input name="from_date" type="text" v-datepicker="from_date" placeholder="Entrada" />
       </div>
       <div class="form-group">
-          <input name="to_date" type="text" v-datepicker="to_date" placeholder="Salida" />
+        <input name="to_date" type="text" v-datepicker="to_date" placeholder="Salida" />
       </div>
       <div class="form-group">
           <label for="rooms">Hab.</label>
@@ -289,6 +193,7 @@ img.rp{
       <div>
       </div>
     </div>
+
   </div>
 </body>
 <script src="js/app.js"></script>

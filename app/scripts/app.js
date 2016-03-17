@@ -31,9 +31,10 @@ Vue.component('preciodesde',{
     startReservation: function() {
       this.$dispatch('startReservation', this.hotel.id);
     },
+
     getHotelAvailability: function(id){
       this.$dispatch('getHotelAvailability', this.hotel.id);
-    },
+    }
   }
 });
 
@@ -72,6 +73,7 @@ new Vue({
     hotel_types: null,
     payment_types: null,
     hoteldetallado: null,
+    inputs_ids: []
   },
 
   computed: {
@@ -240,7 +242,7 @@ new Vue({
     },
     getHotelAvailability: function(id) {
       var self = this;
-      
+
       this.$http.post('proxy/', {'method':'hotels/availabilities/'+id,'qs':'?country_code=AR&currency=ARS&language=es&distribution='+this.distribution+'&checkin_date='+this.from_date_api+'&checkout_date='+this.to_date_api}, {'emulateJSON' : true}).then(
         function(response){
           self.hoteldetallado = response.data;
@@ -249,7 +251,7 @@ new Vue({
           for(i in response.data.roompacks){
             var rp = response.data.roompacks[i];
             for(j in rp.rooms){
-              var ro = rp.rooms[j]; 
+              var ro = rp.rooms[j];
               //para no repetir cuartos en listado
               if(ro.room_code != ro_anterior){
                 //traer la descripcion del meal plan
@@ -355,52 +357,137 @@ new Vue({
 
     promptUserForInfo: function() {
       var self = this;
-      var body = {
-        "payment_method_choice": "1",
-        "form": {
-          "passengers": [{
-            "first_name":"Test",
-            "last_name":"Booking"
-          }],
-          "payment": {
-            "credit_card": {
-              "number":"4242424242424242",
-              "expiration":"2020-12",
-              "security_code":"123",
-              "owner_name":"Test Booking",
-              "owner_document": {
-                "type":"LOCAL",
-                "number":"12345678"
-              },
-              "card_code":"VI",
-              "card_type":"CREDIT"
-            },
-            "billing_address":{
-              "country":"AR",
-              "state":"Buenos Aires",
-              "city":"BUE",
-              "street":"Calle Falsa",
-              "number":"123",
-              "floor":"1",
-              "department":"G",
-              "postal_code":"1234"
+
+      form_choice   = self.bookingPromptInfo.items[0].form_choice;
+      form_choices  = self.bookingPromptInfo.dictionary.form_choices;
+      form_fields   = form_choices[form_choice];
+
+      $('#promtUserForInfo').modal();
+
+      self.getInputs(form_fields, 'form');
+    },
+
+    getInputs: function(fields_object, previous_key) {
+      var self = this;
+      var formId = $('#promtUserFields');
+
+      for(key in fields_object) {
+        var current_key = previous_key + '-' + key
+
+        if(typeof fields_object[key] === "object") {
+          if(typeof fields_object[key].type !== 'undefined') {
+            if(fields_object[key].requirement_type === 'REQUIRED') {
+              switch (fields_object[key].type) {
+                case 'TEXT':
+                  self.inputs_ids.push(current_key);
+                  formId.append("<input type='text' id='"+current_key+"' placeholder='"+key+"' class='patch_data_input' />");
+                  break;
+                case 'BOOLEAN':
+                  break;
+                case 'DATE':
+                  break;
+                case 'DATE_YEAR_MONTH':
+                  break;
+                default:
+                  if(fields_object[key].type.type == 'MULTIVALUED') {
+                    select = $("<select id='"+current_key+"-type' class='patch_data_select'></select>")
+
+                    fields_object[key].type.options.forEach(function(option){
+                      select.append("<option value='"+option.key+"'>"+option.description+"</option>");
+                    });
+
+                    formId.append(select);
+
+                    self.inputs_ids.push(current_key + '-type');
+
+                    if(typeof fields_object[key] === "object") {
+                      this.getInputs(fields_object[key], current_key);
+                    }
+                  }
+              }
             }
-          },
-          "contact":{
-            "email":"testhoteles@despegar.com",
-            "phones":[{
-              "type":"CELULAR",
-              "number":"12345678",
-              "country_code":"54",
-              "area_code":"11"
-            }]
+          } else {
+            if(typeof fields_object[key] === "object") {
+              this.getInputs(fields_object[key], current_key);
+            }
           }
+        }
+      }
+    },
+
+    confirmReservation: function() {
+      var self = this;
+      var body = {};
+
+      // console.log(self.inputs_ids)
+
+      self.inputs_ids.forEach(function(joined_input) {
+        input_split = joined_input.split('-');
+
+        input_split.forEach(function(value, index) {
+          var stringToEval = 'body';
+
+          for (var i = 0; i <= index; i++) {
+            if(eval(stringToEval) == null) {
+              console.log('no')
+            } else {
+              if(i == input_split.length - 1) {
+                eval(stringToEval)[input_split[i]] = $('#'+joined_input).val();
+              } else {
+                if(eval(stringToEval)[input_split[i]] == null) {
+                  if(input_split[i + 1] && $.isNumeric(input_split[i + 1])) {
+                    eval(stringToEval)[input_split[i]] = [];
+                  } else {
+                    eval(stringToEval)[input_split[i]] = {};
+                  }
+                }
+
+                if($.isNumeric(input_split[i])) {
+                  stringToEval = stringToEval + '[' + input_split[i] + ']';
+                } else {
+                  stringToEval = stringToEval + '.' + input_split[i];
+                }
+              }
+            }
+          }
+        });
+      });
+
+      body.payment_method_choice = "1"; //TODO: Ver de donde sale el payment type y qué info requiere.
+      body.form.payment = {
+        "credit_card": {
+          "number":"4242424242424242",
+          "expiration":"2020-12",
+          "security_code":"123",
+          "owner_name":"Test Booking",
+          "owner_document": {
+            "type":"LOCAL",
+            "number":"12345678"
+          },
+          "card_code":"VI",
+          "card_type":"CREDIT"
+        },
+        "billing_address": {
+          "country":"AR",
+          "state":"Buenos Aires",
+          "city":"BUE",
+          "street":"Calle Falsa",
+          "number":"123",
+          "floor":"1",
+          "department":"G",
+          "postal_code":"1234"
         }
       }
 
       this.$http.post('proxy/', {'method':'hotels/bookings/'+self.bookingId+'/forms/'+self.bookingPromptInfo.items[0].id,'qs':'?example=true', 'body': body, 'patch': true}, {'emulateJSON' : true}).then(
         function(response){
-          console.log(response.data)
+          $('#promtUserFields').html(null);
+          
+          $('#promtUserForInfo').modal('hide');
+
+          $('#reservationNumber').html(response.data.reservation_id);
+
+          $('#resultadoReserva').modal();
         },
         this.errorCallback
       );
@@ -420,6 +507,7 @@ new Vue({
     'startReservation': function (hotel_id) {
       this.startReservation();
     },
+
     'getHotelAvailability': function(hotel_id){
       this.getHotelAvailability(hotel_id);
     }

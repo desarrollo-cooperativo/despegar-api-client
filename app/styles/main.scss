@@ -1,0 +1,147 @@
+.patch_data_input {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 5px;
+}
+
+ul#results {
+  list-style: none;
+}
+
+li.hotel {
+  color:#fff;
+  margin: 10px auto;
+  background-color: #e3f1ff;
+  background-image: linear-gradient(#d6ebff, #7baddb);
+}
+
+div.hotel-card {
+    min-height: 300px;
+}
+div.hotel-card h1 {
+  color:#fff;
+  background-color: rgba(0, 0, 0, 0.35);
+  padding:5px;
+  margin-bottom:0;
+}
+div.hotel-card-payment {
+  padding-top: 100px;
+}
+
+div.amenity {
+  margin: 2px;
+}
+
+div.hotel-desc {
+  background-color: rgba(0, 0, 0, 0.35);
+  padding:5px;
+}
+
+div.hotel-address {
+  margin: 5px 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+@keyframes loadingStart {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes loading {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading {
+  position: relative;
+  pointer-events: none;
+  top:50px;
+  min-height: 300px;
+
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    -webkit-animation: loadingStart 3s 300ms linear 1 both;
+    -moz-animation: loadingStart 3s 300ms linear 1 both;
+    -o-animation: loadingStart 3s 300ms linear 1 both;
+    animation: loadingStart 3s 300ms linear 1 both;
+    background: rgba(255, 255, 255, 0.5);
+    text-align: center;
+  }
+
+  .loading-text {
+    font-size: 1.875rem;
+    line-height: 2.3125rem;
+    text-shadow: white 0 0 1em, white 0 0 0.5em, white 0 0 0.25em;
+    position: relative;
+    display: block;
+    text-transform: uppercase;
+    font-weight: bold;
+
+    &:after {
+      content: "...";
+    }
+  }
+
+  .loading-spinner {
+    position: absolute;
+    top: 50%;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: -3.9375rem auto 0;
+    color: #1a1d1d;
+    text-align: center;
+  }
+
+  .loading-icon {
+    font-size: 4.8125rem;
+    line-height: 5.25rem;
+    text-shadow: rgba(255, 255, 255, 0.75) 0 0 0.5em;
+    -webkit-animation: loading 1s steps(4) infinite;
+    -moz-animation: loading 1s steps(4) infinite;
+    -o-animation: loading 1s steps(4) infinite;
+    animation: loading 1s steps(4) infinite;
+    display: block;
+    vertical-align: middle;
+
+    &:before {
+      vertical-align: middle;
+      content: "\e000";
+      font-family: "demo";
+    }
+  }
+}
+
+span.estrellas {
+  color: #ffd700;
+  font-size: 10px;
+  padding:2px;
+}
+
+img.rp{
+  width: 100px;
+  height:auto;
+}
