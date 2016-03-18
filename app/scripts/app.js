@@ -300,6 +300,10 @@ new Vue({
     },
 
     getAvailableHotels: function() {
+      this.hoteldetallado = null;
+      this.hotels = null;
+      this.hotels_details = null;
+    
       var self = this;
       $('#results-container').hide();
       $('#loading-spinner').loadingOverlay({loadingText: 'Un momento por favor, estamos buscando hoteles para vos'});
@@ -324,9 +328,9 @@ new Vue({
           'context_language':'es',
           'shown_currency':'ARS',
           'threat_metrix_id':'TheValue',
-          'client_ip':'200.49.12.204',
-          'user_agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.115 Safari/537.36',
-          'base_url':'www.despegar.com.ar'
+          'client_ip':'',
+          'user_agent':'',
+          'base_url':''
         },
         'keys': {"availability_token":"hsm_retrieve_documentation"}
       };
@@ -363,14 +367,14 @@ new Vue({
       form_fields   = form_choices[form_choice];
 
       $('#promtUserForInfo').modal();
-
+      var formId = $('#promtUserFields');
+      formId.empty();
       self.getInputs(form_fields, 'form');
     },
 
     getInputs: function(fields_object, previous_key) {
       var self = this;
       var formId = $('#promtUserFields');
-
       for(key in fields_object) {
         var current_key = previous_key + '-' + key
 
