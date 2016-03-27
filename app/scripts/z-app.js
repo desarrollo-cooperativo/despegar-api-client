@@ -226,9 +226,12 @@ new Vue({
 
           hotel_details = response.data;
 
-          hotel_details.forEach(function(details, index) {
-            hotel = self.hotels[index];
-            Vue.set(hotel, 'details', details)
+          self.hotels.forEach(function(tmp_hotel, index_hotel) {
+            hotel_details.forEach(function(details, index_detail) {
+              if(tmp_hotel.id == details.id) {
+                Vue.set(self.hotels[index_hotel], 'details', details);
+              }
+            });
           });
         },
         this.errorCallback
@@ -245,6 +248,7 @@ new Vue({
         function(response) {
           self.showModal = false;
           this.showDetails = true;
+          $('body').css('position','fixed');
 
           self.$set('hotel', self.hotels[hotel_index]);
           Vue.set(self.hotel, 'availability', response.data);
@@ -268,19 +272,6 @@ new Vue({
           //       //     break;
           //       //   }
           //       // }
-          //       //imagen
-          //       // for(l in this.hotels_details){
-          //       //   var hd = this.hotels_details[l];
-          //       //   if(hd.id==id){
-          //       //     for (m in hd.room_types){
-          //       //         rt = hd.room_types[m];
-          //       //         if(rt.id == ro.room_code){
-          //       //           rp.imgurl = rt.pictures[0].url;
-          //       //           break;
-          //       //         }
-          //       //     }
-          //       //   }
-          //       // }
           //       rp_simples.push(rp);
           //       ro_anterior = ro.room_code;
           //     }
@@ -294,6 +285,8 @@ new Vue({
 
     hideDetails: function() {
       this.showDetails = false;
+
+      $('body').css('position','');
     },
     //
     // startReservation: function(hotel_id) {

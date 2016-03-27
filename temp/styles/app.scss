@@ -153,6 +153,91 @@
         cursor: pointer;
       }
     }
+
+    .modal-scrollable {
+      width: 100%;
+      height: calc(100% - 40px);
+      overflow-y: scroll;
+
+      .hero-image {
+        width: 100%;
+        height: 250px;
+        overflow: hidden;
+        position: relative;
+
+        img {
+          width: 100%;
+          height: 150%;
+          position: relative;
+        }
+
+        .hero-price {
+          position: absolute;
+          right: 0px;
+          top: 0px;
+          width: 200px;
+          height: 100%;
+          padding: 20px 10px;
+          background-color: rgba(255, 255, 255, 0.6);
+
+          .title {
+            font-size: 0.8em;
+          }
+
+          .price {
+            font-size: 1.5em;
+            font-weight: bold;
+            padding: 10px 0;
+          }
+
+          .view_details {
+            padding-top: 80px;
+          }
+
+          .payment {
+            padding: 5px 0px;
+            font-size: 0.8em;
+
+            .payment_types {
+              text-transform: lowercase;
+            }
+          }
+        }
+      }
+
+      #modal-thumbnails {
+        // display: inline;
+        overflow-x: scroll;
+        width: 100%;
+        white-space: nowrap;
+
+        .modal-thumbnail {
+          width: 70px;
+          height: 50px;
+          padding: 5px;
+          display: block;
+          float: left;
+
+          &:first-child {
+            padding-left: 0px;
+          }
+
+          &:last-child {
+            padding-right: 0px;
+          }
+
+          img {
+            width: 100%;
+            height: 100%;
+          }
+        }
+      }
+
+      #modal-description {
+        text-align: justify;
+        padding: 10px;
+      }
+    }
   }
 }
 
