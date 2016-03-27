@@ -21,11 +21,11 @@ gulp.task('watch', ['styles', 'scripts', 'copy-fonts', 'bootstrap-css', 'bootstr
   ], ['styles']);
 
   gulp.watch([
-    './app/scripts/**/*.js'
+    'app/scripts/**/*.js'
   ], ['scripts']);
 
   gulp.watch([
-    './app/index.html'
+    'app/index.html'
   ]).on('change', browserSync.reload);
 });
 
@@ -97,7 +97,7 @@ gulp.task('scripts', function () {
   gulp.src(['./app/scripts/**/*.js'])
     .pipe(plumber({errorHandler: onError}))
     .pipe(concat('app.js'))
-    .pipe(plumber.stop())
+    // .pipe(plumber.stop())
     .pipe(gulp.dest('./app/js'))
     .pipe(browserSync.stream())
 });

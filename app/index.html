@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>API despegar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
   <link rel="stylesheet" type="text/css" href="css/app.css">
   <link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.11.4/themes/ui-lightness/jquery-ui.css">
@@ -15,186 +16,140 @@
 </head>
 <body>
   <div class="container-fluid form-apidespegar" id="app">
-
-    <!-- promtUserForInfo -->
-    <div class="modal fade" id="promtUserForInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Informaci&oacute;n para realizar la reserva.</h4>
-          </div>
-          <div class="modal-body" id="promtUserFields"></div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-            <button type="button" class="btn btn-primary" v-on:click="confirmReservation()">Reservar</button>
-          </div>
+    <div class="row">
+      <div class="col-xs-12 col-sm-4" id="search_form">
+        <!--
+        <div class="form-group">
+          <label for="pais">Pais</label>
+          <select v-model="country" class="form-control" name="country" id="country" v-on:change="vinces">
+            <option v-for="option in countries.items" v-bind:value="option.id">{{ option.descriptions.es }}</option>
+          </select>
         </div>
-      </div>
-    </div>
-    <!-- promtUserForInfo -->
-
-    <!-- promtUserForInfo -->
-    <div class="modal fade" id="resultadoReserva" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Confirmaci&oacute;n de reserva.</h4>
-          </div>
-          <div class="modal-body">Reserva exitosa! disfruta de tu estad&iacute;a.<br />El n&uacute;mero de reserva es: <span id="reservationNumber"></span></div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-          </div>
+        <div class="form-group">
+          <label for="provincia">Provincia</label>
+          <select v-model="province" class="form-control" name="province" id="province"  v-on:change="getCities">
+            <option v-for="option in provinces.items" v-bind:value="option.id">{{ option.descriptions.es }}</option>
+          </select>
         </div>
-      </div>
-    </div>
-    <!-- promtUserForInfo -->
-
-    <div class="row col-xs-12 col-sm-2">
-      <!--
-      <div class="form-group">
-        <label for="pais">Pais</label>
-        <select v-model="country" class="form-control" name="country" id="country" v-on:change="vinces">
-          <option v-for="option in countries.items" v-bind:value="option.id">{{ option.descriptions.es }}</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="provincia">Provincia</label>
-        <select v-model="province" class="form-control" name="province" id="province"  v-on:change="getCities">
-          <option v-for="option in provinces.items" v-bind:value="option.id">{{ option.descriptions.es }}</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="ciudad">Ciudad</label>
-        <select v-model="city" class="form-control" name="city" id="city">
-          <option v-for="option in cities.items" v-bind:value="option.id">{{ option.descriptions.es }}</option>
-        </select>
-      </div>
-      -->
-      <div class="form-group">
-        <input name="destino" type="text" placeholder="Mar de las Pampas, Buenos Aires" readonly="readonly" />
-      </div>
-      <div class="form-group">
-        <input name="from_date" type="text" v-datepicker="from_date" placeholder="Entrada" />
-      </div>
-      <div class="form-group">
-        <input name="to_date" type="text" v-datepicker="to_date" placeholder="Salida" />
-      </div>
-      <div class="form-group">
-          <label for="rooms">Hab.</label>
-          <select name="rooms" v-model="rooms">
-            <option value="1" selected="selected">1 Habitación</option>
-            <option value="2">2 Habitaciones</option>
-            <option value="3">3 Habitaciones</option>
-            <option value="4">4 Habitaciones</option>
+        <div class="form-group">
+          <label for="ciudad">Ciudad</label>
+          <select v-model="city" class="form-control" name="city" id="city">
+            <option v-for="option in cities.items" v-bind:value="option.id">{{ option.descriptions.es }}</option>
           </select>
-      </div>
-      <div class="form-group">
-          <label for="adults">Adultos</label>
-          <select name="adults" v-model="adults">
-            <option value="1">1</option>
-            <option value="2" selected="selected">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-          </select>
-      </div>
-      <div class="form-group">
-        <label for="adults">Menores</label>
-          <select name="children" v-model="children">
-            <option value="0" selected="selected">0</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-          </select>
-      </div>
-      <button class="btn btn-default" v-on:click="getAvailableHotels">Buscar</button>
-    </div>
-
-    <div id="loading-spinner"></div>
-    <div id="results-container" v-show="hoteldetallado == null && hotels_details.length" class="row col-xs-12 col-sm-10">
-      <ul id="results" class="container-fluid">
-        <li class="hotel row" v-for="res in hotels">
-          <div class="hotel-card col-xs-12 col-sm-8" v-for="hot in hotels_details" v-if="hot.id==res.id" style="background: url('{{ hot.main_picture.url }}') no-repeat top left;background-size:100% 100%;">
-          <h1>{{ res.hotel.name }} <span class="hotel_type btn-info btn-xs" v-for="ht in hotel_types" v-if="res.hotel.hotel_type_id==ht.value">{{ ht.label }}</span><span class="glyphicon glyphicon-star estrellas" aria-hidden="true" v-for="n in hot.stars"></span></h1>
-
-          <detallesprincipales :hotel="res" :hotels-details="hotels_details"></detallesprincipales>
-
-          </div>
-          <div class="hotel-card-payment col-xs-12 col-sm-4 text-center">
-            <preciodesde :hotel="res" :cheapest-night-prices="cheapest_night_prices"></preciodesde>
-            <formapago :hotel="res" :hotel-payment-types="hotel_payment_types"></formapago>
-          </div>
-        </li>
-      </ul>
-    </div>
-    <div id="hotel-view" v-show="hoteldetallado != null" class="row col-xs-12 col-sm-10">
-      <ul id="results" class="container-fluid">
-        <li class="hotel row" v-for="res in hotels" v-if="res.id==hoteldetallado.id">
-          <div class="hotel-card col-xs-12 " v-for="hot in hotels_details" v-if="hot.id==res.id">
-          <div class="volver"><button v-on:click="volver" class="btn btn-info"><< Volver al listado de hoteles</button></div>
-          <h1>{{ res.hotel.name }} <span class="hotel_type btn-info btn-xs" v-for="ht in hotel_types" v-if="res.hotel.hotel_type_id==ht.value">{{ ht.label }}</span><span class="glyphicon glyphicon-star estrellas" aria-hidden="true" v-for="n in hot.stars"></span></h1>
-          <div id="myCarousel" class="carousel slide" data-ride="carousel">
-            <!-- Indicators -->
-            <ol class="carousel-indicators">
-              <li data-target="#myCarousel" v-for="(idx, pic) in hot.pictures" v-if="idx < 11" data-slide-to="{{idx}}" class="{{(idx == 0)?'active':'' }}"></li>
-            </ol>
-            <div class="carousel-inner" role="listbox">
-              <div v-for="(idx, pic) in hot.pictures" v-if="idx < 11" class="{{(idx == 0)?'active':'' }} item">
-                <img class="first-slide" src="{{pic.url}}" alt="">
-              </div>
+        </div>
+        -->
+        <div class="form-group">
+          <label>Destino</label>
+          <input name="destino" type="text" placeholder="Mar de las Pampas, Buenos Aires" readonly="readonly" />
+        </div>
+        <div class="form-group">
+          <label>Desde</label>
+          <input name="from_date" type="text" v-datepicker="from_date" placeholder="Entrada" />
+        </div>
+        <div class="form-group">
+          <label>Hasta</label>
+          <input name="to_date" type="text" v-datepicker="to_date" placeholder="Salida" />
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-xs-12 col-sm-6">
+              <label for="rooms">Cantidad</label>
+              <select name="rooms" v-model="rooms">
+                <option value="1" selected="selected">1 Habitación</option>
+                <option value="2">2 Habitaciones</option>
+                <option value="3">3 Habitaciones</option>
+                <option value="4">4 Habitaciones</option>
+              </select>
             </div>
-            <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
-              <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-              <span class="sr-only">Previous</span>
-            </a>
-            <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
-              <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-              <span class="sr-only">Next</span>
-            </a>
-          </div><!-- /.carousel -->
-
-
-
-          <detallesprincipales :hotel="res" :hotels-details="hotels_details"></detallesprincipales>
-          <hr>
-          <amenities :hotel="res" :amenities="amenities"></amenities>
-          <hr>
-          <h3>Opciones: {{ hoteldetallado.roompacks_simple.length }}</h3>
-          <table class="table table-responsive">
-            <thead>
-              <th>Tipo de habitación</th>
-              <th>Régimen de comidas</th>
-              <th>Políticas de cancelación</th>
-              <th>Habitación por noche</th>
-            </thead>
-            <tr v-for="rp in hoteldetallado.roompacks_simple">
-              <td>{{rp.rooms[0].name}}<br><img class="rp" src="{{rp.imgurl}}" /><br>Capacidad max. {{rp.rooms[0].capacity.max}}</td>
-              <td>{{rp.meal_plan_desc}}</td>
-              <td>{{rp.cancellation_policy.text}}</td>
-              <td>
-              <button class="btn btn-danger" v-on:click="startReservation(res.id)">Comprar ahora ${{rp.price_detail.nightly.subtotal}}</button>
-              <formapago :hotel="res" :hotel-payment-types="hotel_payment_types"></formapago>
-              </td>
-            </tr>
-          </table>
-          <hr>
-          <iframe width="300" height="170" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q={{ hot.location.latitude }},{{ hot.location.longitude }}&hl=es;z=14&output=embed"></iframe><br /><small><a href="https://maps.google.com/maps?q={{ hot.location.latitude }},{{ hot.location.longitude }}&hl=es;z=14&output=embed" style="color:#0000FF;text-align:left" target="_blank">Agrandar el mapa</a></small>
+            <div class="col-xs-12 col-sm-3">
+              <label for="adults">Adultos</label>
+              <select name="adults" v-model="adults">
+                <option value="1">1</option>
+                <option value="2" selected="selected">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+              </select>
+            </div>
+            <div class="col-xs-12 col-sm-3">
+              <label for="adults">Menores</label>
+              <select name="children" v-model="children">
+                <option value="0" selected="selected">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+              </select>
+            </div>
           </div>
-        </li>
-      </ul>
-      <div>
+        </div>
+        <button class="btn btn-primary" v-on:click="getAvailableHotels">Buscar</button>
+      </div>
+      <div class="col-xs-12 col-sm-8" id="results" v-if="hotels">
+        <div v-for="hotelObj in hotels" class="row hotel">
+          <div class="image"><img v-bind:src="hotelObj.details.main_picture.url" /></div>
+          <div class="details">
+            <div class="name">{{hotelObj.hotel.name}}</div>
+            <div v-if="hotelObj.hotel.stars"><span class="glyphicon glyphicon-star estrellas" aria-hidden="true" v-for="stars in hotelObj.hotel.stars"></span></div>
+            <div v-if="hotelObj.details.location.address">{{hotelObj.details.location.address}}</div>
+          </div>
+          <div class="price_box">
+            <div class="title">Habitaci&oacute;n por noche</div>
+            <div class="price" v-for="cnp in cheapest_night_prices" v-if="cnp.h==hotelObj.id">
+              {{ cnp.moneda }} {{ cnp.precio_desde.toFixed(2) }}
+            </div>
+            <div class="view_details">
+              <button class="btn btn-primary" v-on:click="viewDetails(hotelObj.id, $index)">Ver detalle</button>
+            </div>
+            <div class="payment">
+              Pague <span v-for="hpt in hotel_payment_types" v-if="hpt.h==hotelObj.id" class="payment_types"><span v-for="p in hpt.pt">{{ p }}</span></span>!
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
+    <!-- Modals -->
+    <script type="x/template" id="modal">
+      <div class="modal-mask" v-show="show" transition="modal">
+          <div class="table-center">
+            <div class="cell-center">
+              <slot name="body"></slot>
+            </div>
+          </div>
+      </div>
+    </script>
+
+    <modal :show.sync="showModal">
+      <div slot="body">
+        <span class="glyphicon glyphicon-refresh" id="loading-indicator" aria-hidden="true"></span>
+      </div>
+    </modal>
+
+    <modal :show.sync="showDetails">
+      <div slot="body" id="hotel_detail">
+        <div class="modal-wrapper">
+          <div class="modal-container">
+            <div class="modal-bar">
+              <div class="modal-title">Sarasa</div>
+              <div class="modal-close" v-on:click="hideDetails"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></div>
+            </div>
+            <div>imagen</div>
+            <div>thumbs</div>
+            <div>description</div>
+            <div>opciones</div>
+          </div>
+        </div>
+      </div>
+    </modal>
+    <!-- Modals -->
   </div>
-<script src="js/app.js"></script>
+
+  <script src="js/app.js"></script>
 </body>
 </html>
