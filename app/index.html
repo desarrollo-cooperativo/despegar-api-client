@@ -281,8 +281,16 @@
                       <div class="col-xs-12">
                         <div class="form-group">
                           <label>Forma de pago</label>
+                          <div class="payment_type">
+                            <input checked="checked" id="visa" type="radio" name="credit-card" value="visa" />
+                            <label class="drinkcard-cc visa" for="visa"></label>
+                            <input id="mastercard" type="radio" name="credit-card" value="mastercard" />
+                            <label class="drinkcard-cc mastercard"for="mastercard"></label>
+                          </div>
                           <select v-model="reservation.payment_method_choice" class="selectpicker">
-                            <option v-for="roompack in listPayments" v-bind:value="111">222</option>
+                            <optgroup label="{{ listPayment.main_label }}" v-for="listPayment in listPayments">
+                              <option v-bind:value="{{ payment.method.choice }}" v-for="payment in listPayment.payment_array">{{ payment.label }}</option>
+                            </optgroup>
                           </select>
                         </div>
                       </div>

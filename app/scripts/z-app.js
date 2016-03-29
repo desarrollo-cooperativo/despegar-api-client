@@ -180,13 +180,66 @@ new Vue({
 
     listPayments: function() {
       var self      = this,
-          payments  = [];
+          payments  = {
+            'no_int' : {
+              'main_label' : null,
+              'payment_array' : []
+            },
+            'with_int' : {
+              'main_label' : [],
+              'payment_array' : []
+            }
+          },
+          with_int_label = [];
 
       this.current_roompack.payments.forEach(function(payment) {
         payment.payment_methods.forEach(function(method) {
-          payments.push(method);
+          if(method.type != 'cash') {
+            if(method.type == 'at_destination') {
+              payments.no_int.payment_array.push({
+                'label' : 'Pago en destino',
+                'method' : method
+              });
+            } else {
+              if(method.amounts.total_interest_amount == 0) {
+                if(method.installment_quantity == 1) {
+                  payments.no_int.payment_array.push({
+                    'label' : '1 Pago',
+                    'method' : method
+                  });
+                } else {
+                  payments.no_int.payment_array.push({
+                    'label' : method.installment_quantity + ' Cuotas',
+                    'method' : method
+                  });
+                }
+              } else {
+                with_int_label.push(method.installment_quantity);
+
+                payments.with_int.payment_array.push({
+                  'label' : method.installment_quantity + ' Cuotas',
+                  'method' : method
+                });
+              }
+            }
+          }
         });
       });
+
+      var n = {},
+          r = [];
+
+      for(var i = 0; i < with_int_label.length; i++) {
+        if (!n[with_int_label[i]]) {
+          n[with_int_label[i]] = true;
+          r.push(with_int_label[i]);
+        }
+      }
+
+      payments.with_int.main_label = r.join(', ') + ' Cuotas con inter&eacute;s';
+
+      console.log('window.payments');
+      window.payments = payments;
 
       return payments;
     },
@@ -234,6 +287,14 @@ new Vue({
 
       return room_picture;
     },
+
+    // getPaymentLabel: function(roompack_type) {
+    //   if(roompack_type == 'at_destination') {
+    //     return 'Pago en el hotel';
+    //   } else {
+    //     return 'Pago en el hotel';
+    //   }
+    // },
 
     getCountries: function() {
       var self = this;
