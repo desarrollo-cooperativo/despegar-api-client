@@ -2,28 +2,73 @@ new Vue({
   el: '#app',
 
   data: {
-    country:        0,
-    province:       0,
-    city:           0,
-    meal_plans:     null,
-    countries:      null,
-    provinces:      null,
-    cities:         null,
-    hotels:         null,
-    // hotels_details: null,
-    from_date:      null,
-    to_date:        null,
-    adults:         null,
-    children:       null,
-    rooms:          null,
-    amenities:      null,
-    hotel_types:    null,
-    payment_types:  null,
-    hotel_detail:   null,
-    inputs_ids:     [],
-    showModal:      false,
-    showDetails:    false,
-    hotel:          null,
+    country:          0,
+    state:            0,
+    city:             0,
+    meal_plans:       null,
+    countries:        null,
+    states:           null,
+    cities:           null,
+    hotels:           null,
+    from_date:        null,
+    to_date:          null,
+    adults:           2,
+    children:         0,
+    rooms:            null,
+    amenities:        null,
+    hotel_types:      null,
+    payment_types:    null,
+    hotel_detail:     null,
+    inputs_ids:       [],
+    hotel:            null,
+    showModal:        false,
+    showDetails:      false,
+    showPrompt:       false,
+    reservation:      {},
+    expiration_day:   null,
+    expiration_year:  null,
+    phone_type:       [
+      {
+        key: "CELULAR",
+        description: "Celular"
+      },
+      {
+        key: "HOME",
+        description: "Casa"
+      },
+      {
+        key: "WORK",
+        description: "Trabajo"
+      },
+      {
+        key: "FAX",
+        description: "Fax"
+      },
+      {
+        key: "OTHER",
+        description: "Otro"
+      },
+    ],
+    id_types:         [
+      {
+        key: "LOCAL",
+        description: "LOCAL"
+      },
+      {
+        key: "PASSPORT",
+        description: "PASSPORT"
+      }
+    ],
+  },
+
+  watch: {
+    'showDetails': function() {
+      $('.selectpicker').selectpicker('render');
+    },
+
+    'showPrompt': function() {
+      $('.selectpicker').selectpicker('render');
+    },
   },
 
   computed: {
@@ -85,7 +130,7 @@ new Vue({
       return precios;
     },
 
-    hotel_payment_types: function(){
+    hotel_payment_types: function() {
       var hptypes = [];
       var hotel = null;
 
@@ -117,25 +162,57 @@ new Vue({
       }
       return hptypes;
     },
+
+    current_roompack: function() {
+      var self    = this,
+          rp      = {},
+          stored  = false;
+
+      this.hotel.availability.roompacks.forEach(function(roompack) {
+        if(roompack.rooms[0].room_code == self.hotel.selected_code && !stored) {
+          rp = roompack;
+          stored = true;
+        }
+      });
+
+      return rp;
+    },
+
+    listPayments: function() {
+      var self      = this,
+          payments  = [];
+
+      this.current_roompack.payments.forEach(function(payment) {
+        payment.payment_methods.forEach(function(method) {
+          payments.push(method);
+        });
+      });
+
+      return payments;
+    },
+
+    number_of_rooms: function() {
+      var r = [];
+      for (i = 0; i < this.rooms; i++) {
+        r.push(i);
+      }
+      return r;
+    },
   },
 
   created: function () {
-    //this.getCountries();
+    // this.getCountries();
     // this.getMealPlans();
-    this.city = 4703;// mar de las pampas
-    this.from_date = '31-03-2016';
-    this.to_date = '05-04-2016';
+    // this.city = 4703;// mar de las pampas
+    this.city = 2346;// Calafate
+    this.from_date = '11-04-2016';
+    this.to_date = '15-04-2016';
   },
 
   methods: {
-
-    // volver: function(){
-    //   this.hoteldetallado= null;
-    // },
-    //
     // getMealPlans: function(){
     //
-    // var self = this;
+    //   var self = this;
     //
     //   this.$http.post('proxy/', {'method':'hotels/meal-plans','qs':''}, {'emulateJSON' : true}).then(
     //     function(response){
@@ -145,55 +222,86 @@ new Vue({
     //   );
     // },
     //
-    // getCountries: function() {
-    //   var self = this;
-    //
-    //   this.$http.post('proxy/', {'method':'countries','qs':'?product=HOTELS&language=ES'}, {'emulateJSON' : true}).then(
-    //     function(response){
-    //       self.countries = response.data
-    //     },
-    //     this.errorCallback
-    //   );
-    // },
-    //
-    // getProvinces: function() {
-    //   var self = this;
-    //
-    //   this.$http.post('proxy/', {'method':'administrative-divisions','qs':'?product=HOTELS&language=ES&country_id=' + this.country}, {'emulateJSON' : true}).then(
-    //     function(response){
-    //       self.provinces = response.data
-    //     },
-    //     this.errorCallback
-    //   );
-    // },
-    //
-    // getCities: function() {
-    //   var self = this;
-    //
-    //   this.$http.post('proxy/', {'method':'cities','qs':'?product=HOTELS&language=ES&administrative_division_id=' + this.province}, {'emulateJSON' : true}).then(
-    //     function(response){
-    //       self.cities = response.data
-    //     },
-    //     this.errorCallback
-    //   );
-    // },
+    get_room_picture: function(room_code) {
+      var self          = this;
+          room_picture  = null;
 
-    // getHotels: function() {
-    //   var self = this;
-    //
-    //   this.$http.post('proxy/', {'method':'hotels','qs':'?language=es&cities=' + this.city}, {'emulateJSON' : true}).then(
-    //     function(response){
-    //       self.hotels = response.data
-    //     },
-    //     this.errorCallback
-    //   );
-    // },
+      this.hotel.details.room_types.forEach(function(room) {
+        if(room_code == room.id) {
+          room_picture = room.pictures[0].url;
+        }
+      });
+
+      return room_picture;
+    },
+
+    getCountries: function() {
+      var self = this;
+
+      this.$http.post('proxy/', {'method':'countries','qs':'?product=HOTELS&language=ES'}, {'emulateJSON' : true}).then(
+        function(response){
+          self.countries = response.data
+        },
+        this.errorCallback
+      );
+    },
+
+    getStates: function(billing) {
+      var self              = this,
+          selected_country  = null;
+
+      if(billing) {
+        selected_country = this.reservation.form.payment.billing_address.country;
+      } else {
+        selected_country = this.country;
+      }
+
+      this.$http.post('proxy/', {'method':'administrative-divisions','qs':'?product=HOTELS&language=ES&country_id=' + selected_country}, {'emulateJSON' : true}).then(
+        function(response){
+          self.states = response.data
+        },
+        this.errorCallback
+      );
+    },
+
+    getCities: function(billing) {
+      var self              = this,
+          selected_province = null;
+
+      if(billing) {
+        selected_province = this.reservation.form.payment.billing_address.state;
+      } else {
+        selected_province = this.state;
+      }
+
+      this.$http.post('proxy/', {'method':'cities','qs':'?product=HOTELS&language=ES&administrative_division_id=' + selected_province}, {'emulateJSON' : true}).then(
+        function(response){
+          self.cities = response.data
+        },
+        this.errorCallback
+      );
+    },
+
+    displayDetails: function() {
+      this.showDetails = true;
+    },
+
+    hideDetails: function() {
+      this.showDetails = false;
+    },
+
+    showPayment: function() {
+      this.showPrompt = true;
+      this.hideDetails();
+    },
+
+    hidePayment: function() {
+      this.showPrompt = false;
+      this.displayDetails();
+    },
 
     getAvailableHotels: function() {
       var self = this;
-      // this.hoteldetallado = null;
-      // this.hotels = null;
-      // this.hotels_details = null;
 
       this.showModal = true;
 
@@ -247,224 +355,168 @@ new Vue({
       this.$http.post('proxy/hotel.php', {'emulateJSON' : true}).then(
         function(response) {
           self.showModal = false;
-          this.showDetails = true;
-          $('body').css('position','fixed');
+          self.displayDetails();
 
           self.$set('hotel', self.hotels[hotel_index]);
           Vue.set(self.hotel, 'availability', response.data);
 
           console.log('window.hotel')
           window.hotel = self.hotel;
-
-          // var rp_simples = [];
-          // var ro_anterior = 0;
-          // for(i in self.hotel_detail.roompacks){
-          //   var rp = self.hotel_detail.roompacks[i];
-          //   for(j in rp.rooms){
-          //     var ro = rp.rooms[j];
-          //     //para no repetir cuartos en listado
-          //     if(ro.room_code != ro_anterior){
-          //       //traer la descripcion del meal plan
-          //       // for (k in this.meal_plans){
-          //       //   mp = this.meal_plans[k];
-          //       //   if (rp.meal_plan.id == mp.id){
-          //       //     rp.meal_plan_desc = mp.descriptions.es;
-          //       //     break;
-          //       //   }
-          //       // }
-          //       rp_simples.push(rp);
-          //       ro_anterior = ro.room_code;
-          //     }
-          //   }
-          // }
-          // this.hoteldetallado.roompacks_simple = rp_simples;
         },
         this.errorCallback
       );
     },
 
-    hideDetails: function() {
-      this.showDetails = false;
+    startReservation: function(availability_token, room_code) {
+      var self = this;
+      var body = {
+        'source': {
+          'country_code':'AR'
+        },
+        'reservation_context': {
+          'context_language': 'es',
+          'shown_currency': 'ARS',
+          'threat_metrix_id': 'TheValue', //TODO: Que valor va aca?
+          'client_ip': '',
+          'user_agent': navigator.userAgent,
+          'base_url': ''
+        },
+        'keys': {"availability_token": availability_token}
+      };
 
-      $('body').css('position','');
+      Vue.set(self.hotel, 'selected_code', room_code);
+      this.bookingId = null;
+
+      /*** Start new reservation object ***/
+      this.expiration_day = null;
+      this.expiration_year = null;
+      // this.reservation = {
+      //   "payment_method_choice": "1",
+      //   "form": {
+      //     "passengers": [],
+      //     "payment": {
+      //       "credit_card": {
+      //         "number": "4242424242424242",
+      //         "expiration": "2020-12",
+      //         "security_code": "123",
+      //         "owner_name": "Roberto Rosset",
+      //         "owner_document": {
+      //           "type": "LOCAL",
+      //           "number": "30804181"
+      //         },
+      //         "card_code": "VI",
+      //         "card_type": "CREDIT"
+      //       },
+      //       "billing_address": {
+      //         "country": "AR",
+      //         "state": "Buenos Aires",
+      //         "city": "BUE",
+      //         "street": "Calle Falsa",
+      //         "number": "123",
+      //         "floor": "5",
+      //         "department": "8",
+      //         "postal_code": "1428"
+      //       }
+      //     },
+      //     "contact": {
+      //       "email": "bob.rosset@gmail.com",
+      //       "phones": [{
+      //         "type": "CELULAR",
+      //         "number": "12344456",
+      //         "country_code": "54",
+      //         "area_code": "11"
+      //       }]
+      //     }
+      //   }
+      // };
+
+      this.reservation = {
+        payment_method_choice: 1,
+        form: {
+          passengers: [],
+          payment: {
+            credit_card: {
+              number: null,
+              expiration: null,
+              security_code: null,
+              owner_name: null,
+              owner_document: {
+                type: null,
+                number: null
+              },
+              card_code: 'VI',
+              card_type: 'CREDIT'
+            },
+            billing_address: {
+              country: null,
+              state: null,
+              city: null,
+              street: null,
+              number: null,
+              floor: null,
+              department: null,
+              postal_code: null
+            }
+          },
+          contact: {
+            email: null,
+            phones: [{
+              type: null,
+              number: null,
+              country_code: null,
+              area_code: null
+            }]
+          }
+        }
+      };
+
+      this.number_of_rooms.forEach(function(room) {
+        self.reservation.form.passengers.push({
+          first_name: null,
+          last_name: null
+        });
+      });
+      /*** Start new reservation object ***/
+
+      // this.$http.post('proxy/', {'method':'hotels/bookings','qs':'?example=true', 'body': body}, {'emulateJSON' : true}).then(
+      //   function(response){
+      //     self.bookingId = response.data.id;
+      //     self.getBookingForm();
+      //   },
+      //   this.errorCallback
+      // );
+
+      self.showPayment();
     },
-    //
-    // startReservation: function(hotel_id) {
-    //   var self = this;
-    //   var body = {
-    //     'source': {'country_code':'AR'},
-    //     'reservation_context': {
-    //       'context_language':'es',
-    //       'shown_currency':'ARS',
-    //       'threat_metrix_id':'TheValue',
-    //       'client_ip':'',
-    //       'user_agent':'',
-    //       'base_url':''
-    //     },
-    //     'keys': {"availability_token":"hsm_retrieve_documentation"}
-    //   };
-    //
-    //   self.bookingPromptInfo = null;
-    //   self.bookingId = null;
-    //
-    //   this.$http.post('proxy/', {'method':'hotels/bookings','qs':'?example=true', 'body': body}, {'emulateJSON' : true}).then(
-    //     function(response){
-    //       self.bookingId = response.data.id
-    //       self.getBookingForm()
-    //     },
-    //     this.errorCallback
-    //   );
-    // },
-    //
-    // getBookingForm: function() {
-    //   var self = this;
-    //
-    //   this.$http.post('proxy/', {'method':'hotels/bookings/'+self.bookingId+'/forms','qs':'?example=true'}, {'emulateJSON' : true}).then(
-    //     function(response){
-    //       self.bookingPromptInfo = response.data;
-    //       self.promptUserForInfo();
-    //     },
-    //     this.errorCallback
-    //   );
-    // },
-    //
-    // promptUserForInfo: function() {
-    //   var self = this;
-    //
-    //   form_choice   = self.bookingPromptInfo.items[0].form_choice;
-    //   form_choices  = self.bookingPromptInfo.dictionary.form_choices;
-    //   form_fields   = form_choices[form_choice];
-    //
-    //   $('#promtUserForInfo').modal();
-    //   var formId = $('#promtUserFields');
-    //   formId.empty();
-    //   self.getInputs(form_fields, 'form');
-    // },
-    //
-    // getInputs: function(fields_object, previous_key) {
-    //   var self = this;
-    //   var formId = $('#promtUserFields');
-    //   for(key in fields_object) {
-    //     var current_key = previous_key + '-' + key
-    //
-    //     if(typeof fields_object[key] === "object") {
-    //       if(typeof fields_object[key].type !== 'undefined') {
-    //         if(fields_object[key].requirement_type === 'REQUIRED') {
-    //           switch (fields_object[key].type) {
-    //             case 'TEXT':
-    //               self.inputs_ids.push(current_key);
-    //               formId.append("<input type='text' id='"+current_key+"' placeholder='"+key+"' class='patch_data_input' />");
-    //               break;
-    //             case 'BOOLEAN':
-    //               break;
-    //             case 'DATE':
-    //               break;
-    //             case 'DATE_YEAR_MONTH':
-    //               break;
-    //             default:
-    //               if(fields_object[key].type.type == 'MULTIVALUED') {
-    //                 select = $("<select id='"+current_key+"-type' class='patch_data_select'></select>")
-    //
-    //                 fields_object[key].type.options.forEach(function(option){
-    //                   select.append("<option value='"+option.key+"'>"+option.description+"</option>");
-    //                 });
-    //
-    //                 formId.append(select);
-    //
-    //                 self.inputs_ids.push(current_key + '-type');
-    //
-    //                 if(typeof fields_object[key] === "object") {
-    //                   this.getInputs(fields_object[key], current_key);
-    //                 }
-    //               }
-    //           }
-    //         }
-    //       } else {
-    //         if(typeof fields_object[key] === "object") {
-    //           this.getInputs(fields_object[key], current_key);
-    //         }
-    //       }
-    //     }
-    //   }
-    // },
-    //
-    // confirmReservation: function() {
-    //   var self = this;
-    //   var body = {};
-    //
-    //   // console.log(self.inputs_ids)
-    //
-    //   self.inputs_ids.forEach(function(joined_input) {
-    //     input_split = joined_input.split('-');
-    //
-    //     input_split.forEach(function(value, index) {
-    //       var stringToEval = 'body';
-    //
-    //       for (var i = 0; i <= index; i++) {
-    //         if(eval(stringToEval) == null) {
-    //           console.log('no')
-    //         } else {
-    //           if(i == input_split.length - 1) {
-    //             eval(stringToEval)[input_split[i]] = $('#'+joined_input).val();
-    //           } else {
-    //             if(eval(stringToEval)[input_split[i]] == null) {
-    //               if(input_split[i + 1] && $.isNumeric(input_split[i + 1])) {
-    //                 eval(stringToEval)[input_split[i]] = [];
-    //               } else {
-    //                 eval(stringToEval)[input_split[i]] = {};
-    //               }
-    //             }
-    //
-    //             if($.isNumeric(input_split[i])) {
-    //               stringToEval = stringToEval + '[' + input_split[i] + ']';
-    //             } else {
-    //               stringToEval = stringToEval + '.' + input_split[i];
-    //             }
-    //           }
-    //         }
-    //       }
-    //     });
-    //   });
-    //
-    //   body.payment_method_choice = "1"; //TODO: Ver de donde sale el payment type y qué info requiere.
-    //   body.form.payment = {
-    //     "credit_card": {
-    //       "number":"4242424242424242",
-    //       "expiration":"2020-12",
-    //       "security_code":"123",
-    //       "owner_name":"Test Booking",
-    //       "owner_document": {
-    //         "type":"LOCAL",
-    //         "number":"12345678"
-    //       },
-    //       "card_code":"VI",
-    //       "card_type":"CREDIT"
-    //     },
-    //     "billing_address": {
-    //       "country":"AR",
-    //       "state":"Buenos Aires",
-    //       "city":"BUE",
-    //       "street":"Calle Falsa",
-    //       "number":"123",
-    //       "floor":"1",
-    //       "department":"G",
-    //       "postal_code":"1234"
-    //     }
-    //   }
-    //
-    //   this.$http.post('proxy/', {'method':'hotels/bookings/'+self.bookingId+'/forms/'+self.bookingPromptInfo.items[0].id,'qs':'?example=true', 'body': body, 'patch': true}, {'emulateJSON' : true}).then(
-    //     function(response){
-    //       $('#promtUserFields').html(null);
-    //
-    //       $('#promtUserForInfo').modal('hide');
-    //
-    //       $('#reservationNumber').html(response.data.reservation_id);
-    //
-    //       $('#resultadoReserva').modal();
-    //     },
-    //     this.errorCallback
-    //   );
-    // },
+
+    getBookingForm: function() {
+      var self = this;
+
+      this.$http.post('proxy/', {'method':'hotels/bookings/'+self.bookingId+'/forms','qs':'?example=true'}, {'emulateJSON' : true}).then(
+        function(response){
+          response.data.items.forEach(function(booking_rp) {
+            if(booking_rp.roompack_choice == self.current_roompack.choice) {
+              self.booking_roompack_id = booking_rp.id;
+            }
+          });
+          self.showPayment();
+        },
+        this.errorCallback
+      );
+    },
+
+    confirmReservation: function() {
+      var self = this;
+
+      Vue.set(self.reservation.form.payment.credit_card, 'expiration', this.expiration_year + '-' + this.expiration_day);
+
+      this.$http.post('proxy/', {'method':'hotels/bookings/'+self.bookingId+'/forms/'+self.booking_roompack_id,'qs':'?example=true', 'body': this.reservation, 'patch': true}, {'emulateJSON' : true}).then(
+        function(response){
+          console.log(response.data);
+        },
+        this.errorCallback
+      );
+    },
 
     successCallback: function(response) {
       this.showModal = false;
@@ -478,13 +530,30 @@ new Vue({
     },
   },
 
-  events: {
-    // 'startReservation': function (hotel_id) {
-    //   this.startReservation();
-    // },
-    //
-    // 'getHotelAvailability': function(hotel_id){
-    //   this.getHotelAvailability(hotel_id);
-    // }
-  }
+  filters: {
+    unique_roompack: function (roompacks) {
+      var unique_roompacks = [];
+
+      roompacks.forEach(function(roompack) {
+        var add_room = true;
+
+        unique_roompacks.forEach(function(room) {
+          if(roompack.rooms[0].room_code == room.rooms[0].room_code) {
+            add_room = false;
+
+            room.payments.push({ 'payment_methods' : roompack.payment_methods, 'payment_type' : roompack.payment_type })
+          }
+        });
+
+        if(add_room) {
+          roompack.payments = [];
+          roompack.payments.push({ 'payment_methods' : roompack.payment_methods, 'payment_type' : roompack.payment_type });
+
+          unique_roompacks.push(roompack);
+        }
+      });
+
+      return unique_roompacks;
+    }
+  },
 });

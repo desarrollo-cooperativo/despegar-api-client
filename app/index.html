@@ -5,11 +5,12 @@
   <title>API despegar</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="css/bootstrap-select.min.css">
   <link rel="stylesheet" type="text/css" href="css/app.css">
   <link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.11.4/themes/ui-lightness/jquery-ui.css">
   <script src="js/jquery.min.js"></script>
-  <script src="js/loading-overlay.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
+  <script src="js/bootstrap-select.min.js"></script>
   <script src="js/vue.min.js"></script>
   <script src="js/vue-resource.min.js"></script>
   <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
@@ -21,40 +22,40 @@
         <!--
         <div class="form-group">
           <label for="pais">Pais</label>
-          <select v-model="country" class="form-control" name="country" id="country" v-on:change="vinces">
+          <select v-model="country" class="form-control" name="country" id="country" v-on:change="getStates" class="selectpicker">
             <option v-for="option in countries.items" v-bind:value="option.id">{{ option.descriptions.es }}</option>
           </select>
         </div>
         <div class="form-group">
           <label for="provincia">Provincia</label>
-          <select v-model="province" class="form-control" name="province" id="province"  v-on:change="getCities">
-            <option v-for="option in provinces.items" v-bind:value="option.id">{{ option.descriptions.es }}</option>
+          <select v-model="state" class="form-control" name="province" id="province"  v-on:change="getCities" class="selectpicker">
+            <option v-for="option in states.items" v-bind:value="option.id">{{ option.descriptions.es }}</option>
           </select>
         </div>
         <div class="form-group">
           <label for="ciudad">Ciudad</label>
-          <select v-model="city" class="form-control" name="city" id="city">
+          <select v-model="city" class="form-control" name="city" id="city" class="selectpicker">
             <option v-for="option in cities.items" v-bind:value="option.id">{{ option.descriptions.es }}</option>
           </select>
         </div>
         -->
         <div class="form-group">
           <label>Destino</label>
-          <input name="destino" type="text" placeholder="Mar de las Pampas, Buenos Aires" readonly="readonly" />
+          <input class="form-control" name="destino" type="text" placeholder="El Calafate, Argentina" readonly="readonly" />
         </div>
         <div class="form-group">
           <label>Desde</label>
-          <input name="from_date" type="text" v-datepicker="from_date" placeholder="Entrada" />
+          <input class="form-control" name="from_date" type="text" v-datepicker="from_date" placeholder="Entrada" />
         </div>
         <div class="form-group">
           <label>Hasta</label>
-          <input name="to_date" type="text" v-datepicker="to_date" placeholder="Salida" />
+          <input class="form-control" name="to_date" type="text" v-datepicker="to_date" placeholder="Salida" />
         </div>
         <div class="form-group">
           <div class="row">
             <div class="col-xs-12 col-sm-6">
               <label for="rooms">Cantidad</label>
-              <select name="rooms" v-model="rooms">
+              <select name="rooms" v-model="rooms" class="selectpicker">
                 <option value="1" selected="selected">1 Habitación</option>
                 <option value="2">2 Habitaciones</option>
                 <option value="3">3 Habitaciones</option>
@@ -63,27 +64,14 @@
             </div>
             <div class="col-xs-12 col-sm-3">
               <label for="adults">Adultos</label>
-              <select name="adults" v-model="adults">
-                <option value="1">1</option>
-                <option value="2" selected="selected">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
+              <select name="adults" v-model="adults" class="selectpicker">
+                <option v-for="n in 8" v-bind:value="n+1">{{ n+1 }}</option>
               </select>
             </div>
             <div class="col-xs-12 col-sm-3">
               <label for="adults">Menores</label>
-              <select name="children" v-model="children">
-                <option value="0" selected="selected">0</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
+              <select name="children" v-model="children" class="selectpicker">
+                <option v-for="n in 7" v-bind:value="n">{{ n }}</option>
               </select>
             </div>
           </div>
@@ -91,7 +79,7 @@
         <button class="btn btn-primary" v-on:click="getAvailableHotels">Buscar</button>
       </div>
       <div class="col-xs-12 col-sm-8" id="results" v-if="hotels">
-        <div v-for="hotelObj in hotels" class="row hotel">
+        <div v-for="hotelObj in hotels" class="row row-result">
           <div class="image"><img v-bind:src="hotelObj.details.main_picture.url" /></div>
           <div class="details">
             <div class="name">{{hotelObj.hotel.name}}</div>
@@ -132,7 +120,7 @@
     </modal>
 
     <modal :show.sync="showDetails">
-      <div slot="body" id="hotel_detail">
+      <div slot="body" class="basic_modal" id="hotel_modal">
         <div class="modal-wrapper">
           <div class="modal-container" v-if="hotel">
             <div class="modal-bar">
@@ -148,20 +136,319 @@
                     {{ cnp.moneda }} {{ cnp.precio_desde.toFixed(2) }}
                   </div>
                   <div class="view_details">
-                    <button class="btn btn-success" v-on:click="">Comprar</button>
+                    <button class="btn btn-success" v-on:click="startReservation(hotel.availability.availability_token, hotel.roompacks[0].rooms[0].room_code)">Comprar</button>
                   </div>
                   <div class="payment">
                     Pague <span v-for="hpt in hotel_payment_types" v-if="hpt.h==hotel.id" class="payment_types"><span v-for="p in hpt.pt">{{ p }}</span></span>!
                   </div>
                 </div>
               </div>
-              <div id="modal-thumbnails">
+              <!-- <div id="modal-thumbnails">
                 <span v-for="picture in hotel.details.pictures" class="modal-thumbnail">
                   <img v-bind:src="picture.url" />
                 </span>
-              </div>
+              </div> -->
               <div id="modal-description">{{hotel.details.information.es}}</div>
-              <div>opciones</div>
+              <div id="modal-options">
+                <div v-for="room in hotel.availability.roompacks | unique_roompack" class="row row-result">
+                  <div class="image"><img v-bind:src="get_room_picture(room.rooms[0].room_code)" /></div>
+                  <div class="details">
+                    <div class="name">{{room.rooms[0].name}}</div>
+                    <div class="capacity">
+                      <span class="label label-default">
+                        {{room.rooms[0].capacity.max}} <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                      </span>
+                      <span> Capacidad m&aacute;xima</span>
+                    </div>
+                    <div>
+                      <select name="adults" v-model="" class="selectpicker">
+                        <option v-for="bed in room.rooms[0].bed_options" v-bind:value="bed.choice">{{ bed.description }}</option>
+                      </select>
+                    </div>
+                    <div class="cancellation-policy">
+                      {{room.cancellation_policy.text}}
+                    </div>
+                  </div>
+                  <div class="price_box">
+                    <div class="title">Habitaci&oacute;n por noche</div>
+                    <div class="price">
+                      {{ room.price_detail.currency }} {{ room.price_detail.nightly.subtotal.toFixed(2) }}
+                    </div>
+                    <div class="view_details">
+                      <button class="btn btn-success" v-on:click="startReservation(hotel.availability.availability_token, room.rooms[0].room_code)">Comprar</button>
+                    </div>
+                    <div class="payment">
+                      Pague <span v-for="hpt in hotel_payment_types" v-if="hpt.h==hotel.hotel.id" class="payment_types"><span v-for="p in hpt.pt">{{ p }}</span></span>!
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </modal>
+
+    <modal :show.sync="showPrompt" v-if="showPrompt">
+      <div slot="body" class="basic_modal" id="prompt_info">
+        <div class="modal-wrapper">
+          <div class="modal-container">
+            <!-- v-if="hotel" -->
+            <div class="modal-bar">
+              <div class="modal-title">&Uacute;ltimo paso! Asegure su habitaci&oacute;n ahora.</div>
+              <div class="modal-close" v-on:click="hidePayment"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span></div>
+            </div>
+            <div class="modal-scrollable">
+              <div class="col-xs-12 col-sm-8">
+                <div class="panel panel-primary">
+                  <div class="panel-heading">Titular de habitaci&oacute;n</div>
+                  <div class="panel-body">
+                    <div class="row" v-for="room in number_of_rooms">
+                      <div class="col-xs-12 col-sm-6">
+                        <div class="form-group">
+                          <label>Nombre</label>
+                          <input type="text" class="form-control" placeholder="Nombre" v-model="reservation.form.passengers[room].first_name">
+                        </div>
+                      </div>
+                      <div class="col-xs-12 col-sm-6">
+                        <div class="form-group">
+                          <label>Apellido</label>
+                          <input type="text" class="form-control" placeholder="Apellido" v-model="reservation.form.passengers[room].last_name">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="panel panel-primary">
+                  <div class="panel-heading">Informaci&oacute;n de contacto</div>
+                  <div class="panel-body">
+                    <div class="row">
+                      <div class="col-xs-12">
+                        <div class="form-group">
+                          <label>Correo electr&oacute;nico</label>
+                          <input type="text" class="form-control" placeholder="Correo electr&oacute;nico" v-model="reservation.form.contact.email">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-xs-12">
+                        <div class="form-group">
+                          <label>Confirme su correo electr&oacute;nico</label>
+                          <input type="text" class="form-control" placeholder="Correo electr&oacute;nico" v-model="confirmation_email">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-xs-3">
+                        <div class="form-group">
+                          <label>Tel&eacute;fono</label>
+                          <select v-model="reservation.form.contact.phones[0].type" class="selectpicker">
+                            <option v-for="phone in phone_type" v-bind:value="phone.key">{{ phone.description }}</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-xs-3">
+                        <div class="form-group">
+                          <label>Pa&iacute;s</label>
+                          <select v-model="reservation.form.contact.phones[0].country_code" class="selectpicker">
+                            <option v-for="country in countries.items" v-bind:value="country.phone_code">{{ country.descriptions.es }} (+{{ country.phone_code }})</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-xs-3">
+                        <div class="form-group">
+                          <label>&Aacute;rea</label>
+                          <input type="text" class="form-control" placeholder="223" v-model="reservation.form.contact.phones[0].area_code">
+                        </div>
+                      </div>
+                      <div class="col-xs-3">
+                        <div class="form-group">
+                          <label>N&uacute;mero</label>
+                          <input type="text" class="form-control" placeholder="47781111" v-model="reservation.form.contact.phones[0].number">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="panel panel-primary">
+                  <div class="panel-heading">Informaci&oacute;n de pago</div>
+                  <div class="panel-body">
+                    <div class="row">
+                      <div class="col-xs-12">
+                        <div class="form-group">
+                          <label>Forma de pago</label>
+                          <select v-model="reservation.payment_method_choice" class="selectpicker">
+                            <option v-for="roompack in listPayments" v-bind:value="111">222</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-xs-4">
+                        <div class="form-group">
+                          <label>Tarjeta</label>
+                          <select v-model="" class="selectpicker">
+                            <option v-for="n in 8" v-bind:value="n+1">{{ n+1 }}</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="col-xs-5">
+                        <div class="form-group">
+                          <label>N&uacute;mero</label>
+                          <input type="text" class="form-control" placeholder="4242 1234 1234 1234" v-model="reservation.form.payment.credit_card.number">
+                        </div>
+                      </div>
+
+                      <div class="col-xs-3">
+                        <div class="form-group">
+                          <label>C&oacute;digo</label>
+                          <input type="text" class="form-control" placeholder="1234" v-model="reservation.form.payment.credit_card.security_code">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-xs-6">
+                        <div class="form-group expiration-form">
+                          <label>Vencimiento</label>
+                          <div>
+                            <select v-model="expiration_day" class="selectpicker">
+                              <option v-for="n in 12" v-bind:value="n+1">{{ n+1 }}</option>
+                            </select>
+
+                            <select v-model="expiration_year" class="selectpicker">
+                              <option v-for="n in 20" v-bind:value="2016+n">{{ 2016+n }}</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-xs-6">
+                        <div class="form-group">
+                          <label>Titular</label>
+                          <input type="text" class="form-control" placeholder="Rodrigo Perez" v-model="reservation.form.payment.credit_card.owner_name">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-xs-3">
+                        <div class="form-group">
+                          <label>Identificaci&oacute;n</label>
+                          <select v-model="reservation.form.payment.credit_card.owner_document.type" class="selectpicker">
+                            <option v-for="id_type in id_types" v-bind:value="id_type.key">{{ id_type.description }}</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-xs-9">
+                        <div class="form-group">
+                          <label>N&uacute;mero</label>
+                          <input type="text" class="form-control" placeholder="20408159" v-model="reservation.form.payment.credit_card.owner_document.number">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row panel-divider">
+                      <div class="col-xs-4">
+                        <div class="form-group">
+                          <label>Pa&iacute;s</label>
+                          <select v-model="reservation.form.payment.billing_address.country" v-on:change="getStates" class="selectpicker">
+                            <option v-for="option in countries.items" v-bind:value="option.code">{{ option.descriptions.es }}</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-xs-4">
+                        <div class="form-group">
+                          <label>Provincia</label>
+                          <select v-model="reservation.form.payment.billing_address.state" v-on:change="getCities" class="selectpicker">
+                            <option v-for="option in states.items" v-bind:value="option.descriptions.es">{{ option.descriptions.es }}</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-xs-4">
+                        <div class="form-group">
+                          <label>Ciudad</label>
+                          <select v-model="reservation.form.payment.billing_address.city" class="selectpicker">
+                            <option v-for="option in cities.items" v-bind:value="option.descriptions.es">{{ option.descriptions.es }}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-xs-5">
+                        <div class="form-group">
+                          <label>Calle</label>
+                          <input type="text" class="form-control" placeholder="Av. Cabildo" v-model="reservation.form.payment.billing_address.street">
+                        </div>
+                      </div>
+                      <div class="col-xs-2">
+                        <div class="form-group">
+                          <label>N&uacute;mero</label>
+                          <input type="text" class="form-control" placeholder="2180" v-model="reservation.form.payment.billing_address.number">
+                        </div>
+                      </div>
+                      <div class="col-xs-1">
+                        <div class="form-group">
+                          <label>Piso</label>
+                          <input type="text" class="form-control" placeholder="4" v-model="reservation.form.payment.billing_address.floor">
+                        </div>
+                      </div>
+                      <div class="col-xs-1">
+                        <div class="form-group">
+                          <label>Depto.</label>
+                          <input type="text" class="form-control" placeholder="C" v-model="reservation.form.payment.billing_address.department">
+                        </div>
+                      </div>
+                      <div class="col-xs-3">
+                        <div class="form-group">
+                          <label>C&oacute;digo postal</label>
+                          <input type="text" class="form-control" placeholder="1428" v-model="reservation.form.payment.billing_address.postal_code">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <button class="btn btn-success" v-on:click="confirmReservation">Comprar</button>
+                </div>
+              </div>
+
+              <div class="col-xs-12 col-sm-4">
+                <div class="price_box">
+                  <table>
+                    <tr>
+                      <td>Habitaci&oacute;n por noche</td>
+                      <td class="amounts">{{ current_roompack.price_detail.currency }} {{ current_roompack.price_detail.nightly.subtotal.toFixed(2) }}</td>
+                    </tr>
+
+                    <tr>
+                      <td>noches - habitacion</td>
+                      <td class="amounts">{{ current_roompack.price_detail.currency }} {{ current_roompack.price_detail.subtotal.toFixed(2) }}</td>
+                    </tr>
+
+                    <tr>
+                      <td>Impuestos y tasas</td>
+                      <td class="amounts">{{ current_roompack.price_detail.currency }} {{ (current_roompack.price_detail.fee + current_roompack.price_detail.taxes).toFixed(2) }}</td>
+                    </tr>
+
+                    <tr v-if="current_roompack.price_detail.discounts">
+                      <td>Descuentos</td>
+                      <td class="amounts">{{ current_roompack.price_detail.currency }} {{ current_roompack.price_detail.discounts.toFixed(2) }}</td>
+                    </tr>
+
+                    <tr>
+                      <td>Total</td>
+                      <td class="amounts">{{ current_roompack.price_detail.currency }} {{ current_roompack.price_detail.total.toFixed(2) }}</td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -8,8 +8,17 @@
   }
 }
 
-#search_form {
+.panel-divider {
+  border-top: 1px solid #ccc;
+}
+
+.bootstrap-select {
+  width: 100% !important;
+}
+
+#search_form, #prompt_info .modal-scrollable {
   padding: 5px;
+  text-align: left;
 
   label {
     font-size: 0.8em;
@@ -26,63 +35,149 @@
 
 #results {
   padding-top: 18px;
+}
 
-  .hotel {
+.row-result {
+  position: relative;
+  margin: 10px 0px;
+  border: 1px solid #ccc;
+  height: 150px;
+
+  $image_width: 200px;
+  $box_width: 150px;
+  $box_height: 150px;
+
+  [class*="col-"]:first-child {
+    padding-left: 0px;
+  }
+
+  .image {
+    position: absolute;
+
+    img {
+      width: $image_width;
+      height: $box_height - 2;
+    }
+  }
+
+  .details {
+    float: left;
+    padding: 5px;
+    margin-left: 200px;
+    margin-right: 150px;
+    height: $box_height;
+    overflow: auto;
+
+    .name {
+      font-size: 1.5em;
+    }
+  }
+
+  .price_box {
+    position: absolute;
+    width: $box_width;
+    height: $box_height;
+    right: 0px;
+    padding: 5px;
+    text-align: center;
+
+    .title {
+      font-size: 0.8em;
+    }
+
+    .price {
+      font-size: 1.2em;
+      font-weight: bold;
+      padding: 10px 0;
+    }
+
+    .view_details {
+      padding-top: 10px;
+    }
+
+    .payment {
+      padding: 5px 0px;
+      font-size: 0.8em;
+
+      .payment_types {
+        text-transform: lowercase;
+      }
+    }
+  }
+}
+
+.basic_modal {
+  width: 100%;
+  height: 100%;
+  display: table;
+
+  .modal-container {
+    width: 95%;
+    height: 95%;
+    padding: 0;
     position: relative;
-    margin: 10px 0px;
-    border: 1px solid #ccc;
-    height: 150px;
 
-    $image_width: 200px;
-    $box_width: 150px;
-    $box_height: 150px;
+    .modal-bar {
+      position: relative;
 
-    [class*="col-"]:first-child {
-      padding-left: 0px;
-    }
-
-    .image {
-      position: absolute;
-
-      img {
-        width: $image_width;
-        height: $box_height - 2;
-      }
-    }
-
-    .details {
-      float: left;
-      padding: 5px;
-      margin-left: 200px;
-      margin-right: 150px;
-      height: $box_height;
-      overflow: auto;
-
-      .name {
+      .modal-title {
         font-size: 1.5em;
+        padding: 10px 0px 5px 0px;
+        border-bottom: 1px solid #ccc;
+      }
+
+      .modal-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 2.0em;
+        cursor: pointer;
       }
     }
 
-    .price_box {
+    .modal-scrollable {
+      width: 100%;
+      height: calc(100% - 55px);
+      overflow-y: auto;
       position: absolute;
-      width: $box_width;
-      height: $box_height;
+    }
+  }
+}
+
+#hotel_modal {
+  .hero-image {
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+    position: relative;
+
+    img {
+      width: 100%;
+      height: 150%;
+      position: relative;
+    }
+
+    .hero-price {
+      position: absolute;
       right: 0px;
-      padding: 5px;
-      text-align: center;
+      top: 0px;
+      width: 200px;
+      height: 100%;
+      padding: 20px 10px;
+      background-color: rgba(255, 255, 255, 0.6);
 
       .title {
         font-size: 0.8em;
       }
 
       .price {
-        font-size: 1.2em;
+        font-size: 1.5em;
         font-weight: bold;
         padding: 10px 0;
       }
 
       .view_details {
-        padding-top: 10px;
+        padding-top: 80px;
       }
 
       .payment {
@@ -95,119 +190,93 @@
       }
     }
   }
-}
 
-#hotel_detail {
-  width: 100%;
-  height: 100%;
-  display: table;
+  #modal-thumbnails {
+    // display: inline;
+    overflow-x: scroll;
+    width: 100%;
+    white-space: nowrap;
 
-  .modal-container {
-    width: 95%;
-    height: 95%;
-    padding: 5px;
+    .modal-thumbnail {
+      width: 70px;
+      height: 50px;
+      padding: 5px;
+      display: block;
+      float: left;
 
-    .modal-bar {
-      position: relative;
-
-      .modal-title {
-        font-size: 1.5em;
-        padding-top: 5px;
-        border-bottom: 1px solid #ccc;
-        margin-bottom: 5px;
+      &:first-child {
+        padding-left: 0px;
       }
 
-      .modal-close {
-        position: absolute;
-        top: 0;
-        right: 0;
-        font-size: 2.0em;
-        cursor: pointer;
+      &:last-child {
+        padding-right: 0px;
+      }
+
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+
+  #modal-description {
+    text-align: justify;
+    padding: 10px;
+  }
+
+  #modal-options {
+    margin: 10px;
+    text-align: left;
+
+    .row-result {
+      .details {
+        .name {
+          font-size: 1.0em;
+          font-weight: bold;
+        }
+
+        .label {
+          padding: 7px;
+          margin-right: 7px;
+        }
+
+        .capacity {
+          height: 25px;
+        }
+
+        select {
+          width: 170px;
+          margin-top: 5px;
+          padding: 5px;
+        }
+
+        .cancellation-policy {
+          margin-top: 5px;
+          font-size: 0.8em;
+        }
+      }
+    }
+  }
+}
+
+#prompt_info {
+  .modal-scrollable {
+    padding: 10px;
+
+    .expiration-form {
+      .bootstrap-select, select {
+        width: 45% !important;
       }
     }
 
-    .modal-scrollable {
-      width: 100%;
-      height: calc(100% - 40px);
-      overflow-y: scroll;
-
-      .hero-image {
+    .price_box {
+      table {
         width: 100%;
-        height: 250px;
-        overflow: hidden;
-        position: relative;
 
-        img {
-          width: 100%;
-          height: 150%;
-          position: relative;
+        .amounts {
+          width: 100px;
+          text-align: right;
         }
-
-        .hero-price {
-          position: absolute;
-          right: 0px;
-          top: 0px;
-          width: 200px;
-          height: 100%;
-          padding: 20px 10px;
-          background-color: rgba(255, 255, 255, 0.6);
-
-          .title {
-            font-size: 0.8em;
-          }
-
-          .price {
-            font-size: 1.5em;
-            font-weight: bold;
-            padding: 10px 0;
-          }
-
-          .view_details {
-            padding-top: 80px;
-          }
-
-          .payment {
-            padding: 5px 0px;
-            font-size: 0.8em;
-
-            .payment_types {
-              text-transform: lowercase;
-            }
-          }
-        }
-      }
-
-      #modal-thumbnails {
-        // display: inline;
-        overflow-x: scroll;
-        width: 100%;
-        white-space: nowrap;
-
-        .modal-thumbnail {
-          width: 70px;
-          height: 50px;
-          padding: 5px;
-          display: block;
-          float: left;
-
-          &:first-child {
-            padding-left: 0px;
-          }
-
-          &:last-child {
-            padding-right: 0px;
-          }
-
-          img {
-            width: 100%;
-            height: 100%;
-          }
-        }
-      }
-
-      #modal-description {
-        text-align: justify;
-        padding: 10px;
       }
     }
   }
@@ -263,155 +332,3 @@
   -webkit-transform: scale(1.1);
   transform: scale(1.1);
 }
-
-// @font-face {
-//   font-family: "demo";
-//   src: url('../fonts/icons.woff') format("woff"), url('../fonts/icons.ttf') format("truetype");
-// }
-// .patch_data_input {
-//   width: 100%;
-//   margin-bottom: 10px;
-//   padding: 5px;
-// }
-//
-// ul#results {
-//   list-style: none;
-// }
-//
-// li.hotel {
-//   color:#fff;
-//   margin: 10px auto;
-//   background-color: #e3f1ff;
-//   background-image: linear-gradient(#d6ebff, #7baddb);
-// }
-//
-// div.hotel-card {
-//     min-height: 300px;
-// }
-// div.hotel-card h1 {
-//   color:#fff;
-//   background-color: rgba(0, 0, 0, 0.35);
-//   padding:5px;
-//   margin-bottom:0;
-// }
-// div.hotel-card-payment {
-//   padding-top: 100px;
-// }
-//
-// div.amenity {
-//   margin: 2px;
-// }
-//
-// div.hotel-desc {
-//   background-color: rgba(0, 0, 0, 0.35);
-//   padding:5px;
-// }
-//
-// div.hotel-address {
-//   margin: 5px 0;
-// }
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-// @keyframes loadingStart {
-//   0% {
-//     opacity: 0;
-//   }
-//   100% {
-//     opacity: 1;
-//   }
-// }
-// @keyframes loading {
-//   0% {
-//     transform: rotate(0deg);
-//   }
-//   50% {
-//     transform: rotate(180deg);
-//   }
-//   100% {
-//     transform: rotate(360deg);
-//   }
-// }
-//
-// .loading {
-//   position: relative;
-//   pointer-events: none;
-//   top:50px;
-//   min-height: 300px;
-//
-//   .loading-overlay {
-//     position: absolute;
-//     top: 0;
-//     bottom: 0;
-//     left: 0;
-//     right: 0;
-//     -webkit-animation: loadingStart 3s 300ms linear 1 both;
-//     -moz-animation: loadingStart 3s 300ms linear 1 both;
-//     -o-animation: loadingStart 3s 300ms linear 1 both;
-//     animation: loadingStart 3s 300ms linear 1 both;
-//     background: rgba(255, 255, 255, 0.5);
-//     text-align: center;
-//   }
-//
-//   .loading-text {
-//     font-size: 1.875rem;
-//     line-height: 2.3125rem;
-//     text-shadow: white 0 0 1em, white 0 0 0.5em, white 0 0 0.25em;
-//     position: relative;
-//     display: block;
-//     text-transform: uppercase;
-//     font-weight: bold;
-//
-//     &::after {
-//       content: "...";
-//     }
-//   }
-//
-//   .loading-spinner {
-//     position: absolute;
-//     top: 50%;
-//     bottom: 0;
-//     left: 0;
-//     right: 0;
-//     margin: -3.9375rem auto 0;
-//     color: #1a1d1d;
-//     text-align: center;
-//   }
-//
-//   .loading-icon {
-//     font-size: 4.8125rem;
-//     line-height: 5.25rem;
-//     text-shadow: rgba(255, 255, 255, 0.75) 0 0 0.5em;
-//     -webkit-animation: loading 1s steps(4) infinite;
-//     -moz-animation: loading 1s steps(4) infinite;
-//     -o-animation: loading 1s steps(4) infinite;
-//     animation: loading 1s steps(4) infinite;
-//     display: block;
-//     vertical-align: middle;
-//
-//     &::before{
-//       vertical-align: middle;
-//       content: "\e000";
-//       font-family: "demo";    }
-//   }
-//
-// }
-//
-// span.estrellas {
-//   color: #ffd700;
-//   font-size: 10px;
-//   padding:2px;
-// }
-//
-// img.rp{
-//   width: 100px;
-//   height:auto;
-// }

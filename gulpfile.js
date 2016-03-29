@@ -15,7 +15,7 @@ var onError = function (err) {
 
 gulp.task('default', ['browser-sync', 'watch']);
 
-gulp.task('watch', ['styles', 'scripts', 'copy-fonts', 'bootstrap-css', 'bootstrap-js', 'vue-js', 'vue-resource', 'jquery', 'jquery-loading-overlay'], function () {
+gulp.task('watch', ['styles', 'scripts', 'copy-fonts', 'bootstrap-css', 'bootstrap-js', 'vue-js', 'vue-resource', 'jquery', 'bootstrap-select'], function () {
   gulp.watch([
     'app/styles/**/*.scss'
   ], ['styles']);
@@ -66,6 +66,13 @@ gulp.task('bootstrap-js', function() {
     .pipe(gulp.dest('./app/js'))
 });
 
+gulp.task('bootstrap-select', function() {
+  gulp.src(['node_modules/bootstrap-select/dist/css/bootstrap-select.min.css'])
+    .pipe(gulp.dest('./app/css'))
+  gulp.src(['node_modules/bootstrap-select/dist/js/bootstrap-select.min.js'])
+    .pipe(gulp.dest('./app/js'))
+});
+
 gulp.task('vue-js', function() {
   gulp.src(['node_modules/vue/dist/vue.min.js'])
     .pipe(gulp.dest('./app/js'))
@@ -78,11 +85,6 @@ gulp.task('vue-resource', function() {
 
 gulp.task('jquery', function() {
   gulp.src(['node_modules/jquery/dist/jquery.min.js'])
-    .pipe(gulp.dest('./app/js'))
-});
-
-gulp.task('jquery-loading-overlay', function() {
-  gulp.src(['node_modules/jquery-loading-overlay/dist/loading-overlay.min.js'])
     .pipe(gulp.dest('./app/js'))
 });
 
