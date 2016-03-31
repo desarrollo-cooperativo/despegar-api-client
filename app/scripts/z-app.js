@@ -366,8 +366,8 @@ new Vue({
 
       this.showModal = true;
 
-      // this.$http.post('proxy/', {'method':'hotels/availabilities','qs':'?currency=ARS&sorting=total_price_ascending&country_code=AR&language=es&destination=' + this.city+'&distribution='+this.distribution+'&checkin_date='+this.from_date_api+'&checkout_date='+this.to_date_api}, {'emulateJSON' : true}).then(
-      this.$http.post('proxy/buscar.php', {'emulateJSON' : true}).then(
+      this.$http.post('proxy/', {'method':'hotels/availabilities','qs':'?currency=ARS&sorting=total_price_ascending&country_code=AR&language=es&destination=' + this.city+'&distribution='+this.distribution+'&checkin_date='+this.from_date_api+'&checkout_date='+this.to_date_api}, {'emulateJSON' : true}).then(
+      //this.$http.post('proxy/buscar.php', {'emulateJSON' : true}).then(
         function(response){
           console.log('window.hotels');
           window.hotels = response.data.items;
@@ -388,8 +388,8 @@ new Vue({
 
       this.showModal = true;
 
-      // this.$http.post('proxy/', {'method':'hotels','qs':'?ids='+this.hotels_ids.toString()+'&language=es&options=amenities,fees,information,pictures,notices,room_types(information,pictures),extra_details'}, {'emulateJSON' : true}).then(
-      this.$http.post('proxy/details.php', {'emulateJSON' : true}).then(
+      this.$http.post('proxy/', {'method':'hotels','qs':'?ids='+this.hotels_ids.toString()+'&language=es&options=amenities,fees,information,pictures,notices,room_types(information,pictures),extra_details'}, {'emulateJSON' : true}).then(
+      //this.$http.post('proxy/details.php', {'emulateJSON' : true}).then(
         function(response){
           self.showModal = false;
 
@@ -412,8 +412,8 @@ new Vue({
 
       this.showModal = true;
 
-      // this.$http.post('proxy/', {'method':'hotels/availabilities/'+hotel_id,'qs':'?country_code=AR&currency=ARS&language=es&distribution='+this.distribution+'&checkin_date='+this.from_date_api+'&checkout_date='+this.to_date_api}, {'emulateJSON' : true}).then(
-      this.$http.post('proxy/hotel.php', {'emulateJSON' : true}).then(
+      this.$http.post('proxy/', {'method':'hotels/availabilities/'+hotel_id,'qs':'?country_code=AR&currency=ARS&language=es&distribution='+this.distribution+'&checkin_date='+this.from_date_api+'&checkout_date='+this.to_date_api}, {'emulateJSON' : true}).then(
+      //this.$http.post('proxy/hotel.php', {'emulateJSON' : true}).then(
         function(response) {
           self.showModal = false;
           self.displayDetails();
